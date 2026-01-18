@@ -1,4 +1,4 @@
-.members {
+.container {
     margin-left: 3em;
     width: 20em;
     background-color: rgb(207, 214, 218);
@@ -6,7 +6,19 @@
     
 }
 
-.hi {
+.inside-container {
+    margin-top: 2em;
+    margin-left: 2em;
+}
+
+.container-hw {
+    margin-left: 3em;
+    background-color: rgb(207, 214, 218);
+    color: black;
+    
+}
+
+.members {
     display: flex;
 }
 
