@@ -3,7 +3,11 @@
     width: 20em;
     background-color: rgb(207, 214, 218);
     color: black;
+    
+}
 
+.hi {
+    display: flex;
 }
 
 body {
