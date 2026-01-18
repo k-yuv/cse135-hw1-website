@@ -1,0 +1,15 @@
+.members {
+    margin-left: 3em;
+    width: 20em;
+    background-color: rgb(207, 214, 218);
+    color: black;
+
+}
+
+body {
+    background-color: rgb(243, 246, 246);
+    margin: 2em 2em 2em 2em;
+    font-family: 'Courier New', Courier, monospace;
+    color: rgb(209, 215, 216);
+    background-color: rgb(37, 36, 37);
+}
