@@ -1,31 +1,66 @@
+/* Theme variables */
+:root {
+  --bg: pink;
+  --text: palevioletred;
+  --card: rgb(207, 214, 218);
+  --pre: black;
+}
+
+:root[data-theme="dark"] {
+  --bg: #1f1422;     
+  --text: #ffe9f7;   
+  --card: #2b182f;   
+  --pre: #ffe9f7;   
+}
+
 .container {
-    margin-left: 3em;
-    width: 20em;
-    background-color: rgb(207, 214, 218);
-    color: black;
-    
+  margin-left: 3em;
+  width: 20em;
+  background-color: var(--card);
+  color: black;
 }
 
 .inside-container {
-    margin-top: 2em;
-    margin-left: 2em;
+  margin-top: 2em;
+  margin-left: 2em;
 }
 
 .container-hw {
-    margin-left: 3em;
-    background-color: rgb(207, 214, 218);
-    color: black;
-    
+  margin-left: 3em;
+  background-color: var(--card);
+  color: black;
 }
 
 .members {
-    display: flex;
+  display: flex;
 }
 
+/* Body */
 body {
-    background-color: rgb(243, 246, 246);
-    margin: 2em 2em 2em 2em;
-    font-family: 'Courier New', Courier, monospace;
-    color: rgb(209, 215, 216);
-    background-color: rgb(37, 36, 37);
+  margin: 2em;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+
+about-mymelody,
+my-melody-emoticon {
+  display: block;
+  background-color: var(--bg);
+  padding: 1rem;
+}
+
+/* This replaces your nested h1, h2, h3, ul, li block */
+about-mymelody h1,
+about-mymelody h2,
+about-mymelody h3,
+about-mymelody ul,
+about-mymelody li {
+  color: var(--text);
+}
+
+/* This replaces your nested pre block */
+my-melody-emoticon pre {
+  color: var(--pre);
 }
