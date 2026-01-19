@@ -21,7 +21,8 @@
   margin-left: 3em;
   width: 20em;
   background-color: var(--card);
-  color: black;
+  color: var(--pre);
+  border-radius: .5em;
 }
 
 .inside-container {
@@ -30,9 +31,18 @@
 }
 
 .container-hw {
+  margin-top: 2em;
   margin-left: 3em;
   background-color: var(--card);
-  color: black;
+  color: var(--pre);
+  border-radius: .5em;
+}
+
+.inside-hw-container {
+  padding-top: .5em;
+  padding-bottom: .5em;
+  margin-left: 2em
+  /*text-align: center;*/
 }
 
 .members {
@@ -84,12 +94,12 @@ about-pompompurin h2,
 about-pompompurin h3,
 about-pompompurin ul,
 about-pompompurin li {
-  color: var(--text);
+  color: rgb(156, 86, 68);
 }
 
 /* This replaces your nested pre block */
 pompompurin-emoticon pre {
-  color: var(--pre);
+  color: rgb(156, 86, 68);
 }
 
 about-kuromi, kuromi-emoticon {
