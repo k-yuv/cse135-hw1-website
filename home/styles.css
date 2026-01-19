@@ -43,11 +43,10 @@ body {
   color: var(--text);
 }
 
-
 about-mymelody,
 my-melody-emoticon {
   display: block;
-  background-color: var(--bg);
+  background-color: pink;
   padding: 1rem;
 }
 
@@ -62,5 +61,29 @@ about-mymelody li {
 
 /* This replaces your nested pre block */
 my-melody-emoticon pre {
+  color: var(--pre);
+}
+
+
+/*POMPOMPURIN*/
+about-pompompurin,
+pompompurin-emoticon {
+  border-radius: .5em;
+  background-color: rgb(255, 233, 192);
+  display: block;
+  padding: 1rem;
+}
+
+/* This replaces your nested h1, h2, h3, ul, li block */
+about-pompompurin h1,
+about-pompompurin h2,
+about-pompompurin h3,
+about-pompompurin ul,
+about-pompompurin li {
+  color: var(--text);
+}
+
+/* This replaces your nested pre block */
+pompompurin-emoticon pre {
   color: var(--pre);
 }
