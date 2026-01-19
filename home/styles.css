@@ -2,8 +2,11 @@
 :root {
   --bg: pink;
   --text: palevioletred;
-  --card: rgb(207, 214, 218);
+  --bg2: rgb(172, 136, 203);
+  --text2: rgb(92, 27, 114);
+  --card: palevioletred;
   --pre: black;
+  --pre2: rgb(92, 27, 114);   
 }
 
 :root[data-theme="dark"] {
@@ -11,6 +14,7 @@
   --text: #ffe9f7;   
   --card: #2b182f;   
   --pre: #ffe9f7;   
+  --pre2: rgb(92, 27, 114);   
 }
 
 .container {
@@ -86,4 +90,22 @@ about-pompompurin li {
 /* This replaces your nested pre block */
 pompompurin-emoticon pre {
   color: var(--pre);
+}
+
+about-kuromi, kuromi-emoticon {
+  display: block;
+  background-color: var(--bg2);
+  padding: 1rem;
+}
+
+about-kuromi h1,
+about-kuromi h2,
+about-kuromi h3,
+about-kuromi ul,
+about-kuromi li {
+  color: var(--text2);
+}
+
+kuromi-emoticon pre {
+  color: var(--pre2);
 }
