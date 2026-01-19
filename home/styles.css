@@ -6,7 +6,7 @@
   --text2: rgb(92, 27, 114);
   --card: palevioletred;
   --pre: black;
-  --pre2: rgb(92, 27, 114);   
+  --pre2: black;   
 }
 
 :root[data-theme="dark"] {
