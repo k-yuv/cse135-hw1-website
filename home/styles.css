@@ -17,36 +17,86 @@
   --pre2: rgb(92, 27, 114);   
 }
 
-.container {
-  margin-left: 3em;
-  width: 20em;
-  background-color: var(--card);
-  color: var(--pre);
-  border-radius: .5em;
+hr{
+  color: palevioletred;
 }
 
-.inside-container {
-  margin-top: 2em;
-  margin-left: 2em;
-}
-
-.container-hw {
-  margin-top: 2em;
-  margin-left: 3em;
-  background-color: var(--card);
-  color: var(--pre);
-  border-radius: .5em;
-}
-
-.inside-hw-container {
-  padding-top: .5em;
-  padding-bottom: .5em;
-  margin-left: 2em
-  /*text-align: center;*/
-}
-
-.members {
+h1, h2{
   display: flex;
+  flex-direction: column; 
+  align-items: center;
+
+}
+
+header nav{
+    flex-direction: column; 
+    align-items: center;
+    gap: .5rem;
+  }
+header nav a{
+    display: block;
+    padding: .6rem 1rem;
+  }
+header nav{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: space-between;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    font-size: 1rem; 
+    background-color: white;
+    border-top: 0.25rem solid palevioletred;
+    border-bottom: 0.25rem solid palevioletred;
+    border-left: 0.25rem solid palevioletred;
+    border-right: 0.25rem solid palevioletred;
+
+}
+
+header nav a {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;            
+  color: black; 
+  font-weight: bold;
+  font-size: 1rem;
+  transition: color 0.25s ease, transform 0.15s ease;
+}
+header nav a:hover {
+  color: #fe8cac; 
+  transform: scale(1.25); 
+  text-shadow: 0 0 5px rgba(254, 140, 172, 0.7);
+  text-decoration: underline;
+}
+
+homework-1, homework-2{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: white;
+  margin: 2rem;
+  color: black;
+  border-top: 0.25rem solid palevioletred;
+  border-bottom: 0.25rem solid palevioletred;
+  border-left: 0.25rem solid palevioletred;
+  border-right: 0.25rem solid palevioletred;
+}
+footer{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+about-me{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
 }
 
 /* Body */
@@ -57,26 +107,6 @@ body {
   color: var(--text);
 }
 
-about-mymelody,
-my-melody-emoticon {
-  display: block;
-  background-color: pink;
-  padding: 1rem;
-}
-
-/* This replaces your nested h1, h2, h3, ul, li block */
-about-mymelody h1,
-about-mymelody h2,
-about-mymelody h3,
-about-mymelody ul,
-about-mymelody li {
-  color: var(--text);
-}
-
-/* This replaces your nested pre block */
-my-melody-emoticon pre {
-  color: var(--pre);
-}
 
 
 /*POMPOMPURIN*/
