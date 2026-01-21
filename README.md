@@ -22,3 +22,11 @@ Password: Sanrio135Cse
 
 Username: keyura
 Password: Sanrio135Cse
+
+# Link to yourdomain.siteLinks to an external site
+
+# Details of Github auto deploy setup
+
+# Summary of changes to HTML file in DevTools after compression
+
+# Summary of removing 'server' header
