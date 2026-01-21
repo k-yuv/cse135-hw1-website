@@ -91,14 +91,21 @@ footer{
   padding: 1rem;
 }
 
-about-me{
-  display: flex;
+about-me-section{
+  display: block;
   align-items: center;
   justify-content: center;
   gap: 1rem;
   padding: 1rem;
+  background-color: white;
+  margin: 2rem;
+  color: black;
+  border-top: 0.25rem solid palevioletred;
+  border-bottom: 0.25rem solid palevioletred;
+  border-left: 0.25rem solid palevioletred;
+  border-right: 0.25rem solid palevioletred;
+  
 }
-
 /* Body */
 body {
   margin: 2em;

@@ -3,3 +3,4 @@ Disallow: /grader/
 Disallow: /keyura/
 Disallow: /annejulia/
 Disallow: /dishita/
+Allow: /
