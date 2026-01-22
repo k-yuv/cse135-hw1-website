@@ -34,5 +34,6 @@ htpasswd keyura - Sanrio135Cse
 htpasswd annejulia - Sanrio135Cse
 
 # Summary of changes to HTML file in DevTools after compression
+Before compression the content length of the HTML file was 2641, and after compression it became 1006. So we clearly observed a compression of the HTML file.
 
 # Summary of removing 'server' header
