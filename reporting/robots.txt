@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /grader/
+Disallow: /keyura/
+Disallow: /annejulia/
+Disallow: /dishita/
+Allow: /
