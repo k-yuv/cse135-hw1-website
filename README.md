@@ -36,4 +36,7 @@ htpasswd annejulia - Sanrio135Cse
 # Summary of changes to HTML file in DevTools after compression
 Before compression the content length of the HTML file was 2641, and after compression it became 1006. So we clearly observed a compression of the HTML file.
 
-# Summary of removing 'server' header
+# Summary of removing 'server' header (Partt 3 Step 6)
+Naturally, Apache cannot change the server name, so I had to search how to hcnage my server name permanently. I found this link https://www.howtoforge.com/changing-apache-server-name-to-whatever-you-want-with-mod_security-on-debian-6
+
+Following the guide on this link I installed mod security, and I enabled it. It's known as a sever signature, so that is why you see CSE 135 Server.
