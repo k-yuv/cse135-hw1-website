@@ -25,3 +25,4 @@ jobs:
           rsync -avz --delete collector/ $SERVER_USER@$SERVER_IP:/var/www/collector.cse135hw1.online/
           rsync -avz --delete reporting/ $SERVER_USER@$SERVER_IP:/var/www/reporting.cse135hw1.online/
           rsync -avz --delete www/ $SERVER_USER@$SERVER_IP:/var/www/www.cse135hw1.online/
+          rsync -avz --delete www/ $SERVER_USER@$SERVER_IP:/var/www/html
