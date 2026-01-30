@@ -2,11 +2,11 @@
 header('Cache-Control: no-cache');
 header('Content-Type: text/json');
 ?>
-<?php $date =  date('Y-m-d H:i:s'); ?></p>
+<?php $date =  date('Y-m-d H:i:s'); ?>
 
-<p><?php
+<?php
 $address = $_SERVER['REMOTE_ADDR'];
-?></p>
+?>
 
 <?php
 $message = array(
