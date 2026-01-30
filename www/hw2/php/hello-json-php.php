@@ -10,9 +10,9 @@ $address = $_SERVER['REMOTE_ADDR'];
 
 <?php
 $message = array(
-    'title' => 'Hello, Perl!',
-    'heading' => 'Hello, Perl!',
-    'message' => 'This page was generated with the Perl programming language',
+    'title' => 'Hello, PHP!',
+    'heading' => 'Hello, PHP!',
+    'message' => 'This page was generated with the PHP programming language',
     'time' => $date,
     'IP' => $address
 );
