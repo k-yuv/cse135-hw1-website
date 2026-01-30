@@ -12,7 +12,7 @@ header('Content-Type: text/html');
 
 ksort($_ENV);
 foreach ($_ENV as $variable => $value) {
-    echo "<b>$variable:</b> $value<br />\n";
+    print "<b>$variable:</b> $value<br />\n";
 }
 
 ?>
