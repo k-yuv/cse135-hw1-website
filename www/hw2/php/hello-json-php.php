@@ -1,0 +1,23 @@
+<?php
+header('Cache-Control: no-cache');
+header('Content-Type: text/json');
+?>
+<?php $date =  date('Y-m-d H:i:s'); ?></p>
+
+<p><?php
+$address = $_SERVER['REMOTE_ADDR'];
+?></p>
+
+<?php
+$message = array(
+    'title' => 'Hello, Perl!',
+    'heading' => 'Hello, Perl!',
+    'message' => 'This page was generated with the Perl programming language',
+    'time' => $date,
+    'IP' => $address
+);
+
+$json = json_encode($message);
+
+echo $json . "\n";
+?>
