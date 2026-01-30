@@ -20,7 +20,7 @@ header('Content-Type: text/html');
 
 <p><?php
 $address = $_SERVER['REMOTE_ADDR'];
-echo "Your current IP address is: $address";
+echo "Your current IP Address is: $address";
 ?></p>
 
 </body>
