@@ -10,8 +10,7 @@ header('Content-Type: text/html');
 
 <?php
 
-ksort($_ENV);
-foreach ($_ENV as $variable => $value) {
+foreach ($_SERVER as $variable => $value) {
     print "<b>$variable:</b> $value<br />\n";
 }
 
