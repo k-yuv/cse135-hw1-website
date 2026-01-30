@@ -4,7 +4,7 @@ header('Content-Type: text/html');
 ?>
 
 <!DOCTYPE html>
-<html>;
+<html>
 <head>
 <title>Hello CGI World</title>
 </head>
