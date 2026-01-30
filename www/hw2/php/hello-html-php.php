@@ -1,3 +1,8 @@
+<?php
+header('Cache-Control: no-cache');
+header('Content-Type: text/html');
+?>
+
 <!DOCTYPE html>
 <html>;
 <head>
@@ -11,6 +16,11 @@
 
 <p>This program was generated at: <?php $date =  date('Y-m-d H:i:s');
                                         echo $date; 
+?></p>
+
+<p><?php
+$address = $_SERVER['REMOTE_ADDR'];
+echo "Your current IP address is: $address";
 ?></p>
 
 </body>
