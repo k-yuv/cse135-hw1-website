@@ -18,5 +18,5 @@ $form_data = file_get_contents('php://input');
 $bytes_read = strlen($form_data);
 ?>
 
-<p><b>Message Body:</b> $form_data </p>
+<p><b>Message Body:</b> <?php echo $form_data; ?> </p>
 </body></html>
