@@ -9,14 +9,14 @@ header('Content-Type: text/html');
 <hr>
 
 
-<p><b>HTTP Protocol:</b> $ENV{SERVER_PROTOCOL}</p>
-<p><b>HTTP Method:</b> $ENV{REQUEST_METHOD}</p>
-<p><b>Query String:</b> $ENV{QUERY_STRING}</p>
+<p><b>HTTP Protocol:</b> <?php echo $_SERVER['SERVER_PROTOCOL']; ?></p>
+<p><b>HTTP Method:</b> <?php echo $_SERVER['REQUEST_METHOD']; ?></p>
+<p><b>Query String:</b> <?php echo $_SERVER['QUERY_STRING']; ?></p>
 
 <?php
 $form_data = file_get_contents('php://input');
 $bytes_read = strlen($form_data);
 ?>
 
-<p><b>Message Body:</b> $form_data</p>
+<p><b>Message Body:</b> $form_data </p>
 </body></html>
