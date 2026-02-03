@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Echo Form Tester</title>
+</head>
+<body>
+    <h1>Echo Form Tester</h1>
+
+    <form id="echoForm" method="POST" action="/cgi-bin/echo-python.py">
+        <div class="form-group">
+            <label for="language">Language:</label>
+            <select name="language" id="language">
+                <option value="python" selected>Python</option>
+                <option value="php">PHP</option>
+                <option value="c">C</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="method">HTTP Method:</label>
+            <select name="method" id="method">
+                <option value="GET">GET</option>
+                <option value="POST" selected>POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="encoding">Encoding:</label>
+            <select name="encoding" id="encoding">
+                <option value="application/x-www-form-urlencoded" selected>x-www-form-urlencoded</option>
+                <option value="application/json">application/json</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="field1">Field 1 (Name):</label>
+            <input type="text" name="field1" id="field1" value="John Doe">
+        </div>
+
+        <div class="form-group">
+            <label for="field2">Field 2 (Email):</label>
+            <input type="text" name="field2" id="field2" value="john@example.com">
+        </div>
+
+        <div class="form-group">
+            <label for="field3">Field 3 (Message):</label>
+            <textarea name="field3" id="field3" rows="3">Hello, this is a test message!</textarea>
+        </div>
+
+        <div class="form-group">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+    <div id="response" class="response" style="display:none;">
+        <h2>Response:</h2>
+        <pre id="responseContent"></pre>
+    </div>
+
+    <script>
+        // JavaScript-enhanced functionality
+        const form = document.getElementById('echoForm');
+        const languageSelect = document.getElementById('language');
+        const methodSelect = document.getElementById('method');
+        const encodingSelect = document.getElementById('encoding');
+        const responseDiv = document.getElementById('response');
+        const responseContent = document.getElementById('responseContent');
+
+        // Update form action based on language selection
+        languageSelect.addEventListener('change', function() {
+            const endpoints = {
+                'python': '/cgi-bin/echo-python.py',
+                'php': '/cgi-bin/echo-php.php',
+                'c': '/cgi-bin/echo-c.cgi'
+            };
+            form.action = endpoints[this.value];
+        });
+
+        // Handle form submission with AJAX
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const method = methodSelect.value;
+            const encoding = encodingSelect.value;
+            const formData = new FormData(form);
+            
+            let body;
+            let headers = {};
+
+            if (encoding === 'application/json') {
+                // Convert form data to JSON
+                const jsonData = {};
+                formData.forEach((value, key) => {
+                    if (key !== 'language' && key !== 'method' && key !== 'encoding') {
+                        jsonData[key] = value;
+                    }
+                });
+                body = JSON.stringify(jsonData);
+                headers['Content-Type'] = 'application/json';
+            } else {
+                // Use URLSearchParams for x-www-form-urlencoded
+                const urlParams = new URLSearchParams();
+                formData.forEach((value, key) => {
+                    if (key !== 'language' && key !== 'method' && key !== 'encoding') {
+                        urlParams.append(key, value);
+                    }
+                });
+                body = urlParams.toString();
+                headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            }
+
+            // For GET and DELETE, append data to URL
+            let url = form.action;
+            if (method === 'GET' || method === 'DELETE') {
+                const urlParams = new URLSearchParams();
+                formData.forEach((value, key) => {
+                    if (key !== 'language' && key !== 'method' && key !== 'encoding') {
+                        urlParams.append(key, value);
+                    }
+                });
+                url += '?' + urlParams.toString();
+                body = null;
+            }
+
+            // Make the request
+            fetch(url, {
+                method: method,
+                headers: headers,
+                body: body
+            })
+            .then(response => response.text())
+            .then(data => {
+                responseDiv.style.display = 'block';
+                responseContent.textContent = data;
+            })
+            .catch(error => {
+                responseDiv.style.display = 'block';
+                responseContent.innerHTML = '<span class="error">Error: ' + error.message + '</span>';
+            });
+        });
+    </script>
+</body>
+</html>
