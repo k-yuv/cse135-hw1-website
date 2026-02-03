@@ -13,7 +13,7 @@ static const char *getEnv(const char *IPAddress, const char *unknownIP){
 
 int main(void){
     const char *visitorIP = getEnv("REMOTE_ADDR", "Unknown IP Address");
-    
+
     time_t now = time(NULL);
     char *timeString = ctime(&now);
 
