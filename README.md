@@ -11,6 +11,8 @@ Grader access to server:
 # 3rd party page analytics
 For the third party page analytics, we used Microsoft Clarity. We did research on different analytics tools and decided that Clarity was the best option because it is free and easy to set up.
 
+# Note to Grader
+The files linked from the website are under usr/lib/cgi-bin in the server. To make for more efficient grader, our source code for each link is under the www/hw2 directory in the repository, while our working code is in /cgi-bin.
 
 # --- HW 1 --- 
 
