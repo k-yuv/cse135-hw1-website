@@ -1,8 +1,98 @@
+/**
+ * collector-v9.js – Analytics Collector
+ */
+
 (function () {
   'use strict';
 
-  const ENDPOINT = 'https://example.com/collect';
+  // Config
+  const config = {
+    endpoint: '',
+    enableVitals: true,
+    enableErrors: true,
+    sampleRate: 1.0,
+    debug: false,
+    respectConsent: true,
+    detectBots: true
+  };
 
+  // Internal state
+  let initialized = false;
+  let blocked = false;
+  const customData = {};
+  let userId = null;
+  const plugins = [];
+  const reportedErrors = new Set();
+  let errorCount = 0;
+  const MAX_ERRORS = 10;
+
+  // Web Vitals
+  const vitals = { lcp: null, cls: 0, inp: null };
+
+  // Time-on-page
+  let pageShowTime = Date.now();
+  let totalVisibleTime = 0;
+
+  // Utility
+  function round(n) {
+    return Math.round(n * 100) / 100;
+  }
+
+  function merge(dst, src) {
+    for (const key of Object.keys(src)) {
+      dst[key] = src[key];
+    }
+    return dst;
+  }
+
+  // Consent
+  function hasConsent() {
+    if (navigator.globalPrivacyControl) {
+      return false;
+    }
+
+    const cookies = document.cookie.split(';');
+    for (const c of cookies) {
+      const cookie = c.trim();
+      if (cookie.indexOf('analytics_consent=') === 0) {
+        return cookie.split('=')[1] === 'true';
+      }
+    }
+
+    return false;
+  }
+
+  // Bot detection
+  function isBot() {
+    if (navigator.webdriver) return true;
+
+    const ua = navigator.userAgent;
+    if (/HeadlessChrome|PhantomJS|Lighthouse/i.test(ua)) return true;
+
+    if (/Chrome/.test(ua) && !window.chrome) return true;
+
+    if (window._phantom || window.__nightmare || window.callPhantom) return true;
+
+    return false;
+  }
+
+  // Sampling
+  function isSampled() {
+    if (config.sampleRate >= 1.0) return true;
+    if (config.sampleRate <= 0) return false;
+
+    const key = '_collector_sample';
+    let val = sessionStorage.getItem(key);
+    if (val === null) {
+      val = Math.random();
+      sessionStorage.setItem(key, val);
+    } else {
+      val = parseFloat(val);
+    }
+    return val < config.sampleRate;
+  }
+
+  // Session identity
   function getSessionId() {
     let sid = sessionStorage.getItem('_collector_sid');
     if (!sid) {
@@ -12,474 +102,439 @@
     return sid;
   }
 
-  function getTechnographics() {
-    let networkInfo = {};
-    if ('connection' in navigator) {
-      const conn = navigator.connection;
-      networkInfo = {
-        effectiveType: conn.effectiveType,
-        downlink: conn.downlink,
-        rtt: conn.rtt,
-        saveData: conn.saveData,
-      };
-    }
+  // Technographics
+  function getNetworkInfo() {
+    if (!('connection' in navigator)) return {};
+    const conn = navigator.connection;
+    return {
+      effectiveType: conn.effectiveType,
+      downlink: conn.downlink,
+      rtt: conn.rtt,
+      saveData: conn.saveData
+    };
+  }
 
+  function getTechnographics() {
     return {
       userAgent: navigator.userAgent,
       language: navigator.language,
       cookiesEnabled: navigator.cookieEnabled,
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
-      screenWidth: screen.width,
-      screenHeight: screen.height,
+      screenWidth: window.screen.width,
+      screenHeight: window.screen.height,
       pixelRatio: window.devicePixelRatio,
       cores: navigator.hardwareConcurrency || 0,
       memory: navigator.deviceMemory || 0,
-      network: networkInfo,
-      colorScheme: window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light',
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      network: getNetworkInfo(),
+      colorScheme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
   }
 
-  // 🔹 New: wrap the blob / beacon logic in a function
-  function send(payload) {
-    const blob = new Blob([JSON.stringify(payload)], {
-      type: 'application/json',
-    });
-
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(ENDPOINT, blob);
-    } else {
-      fetch(ENDPOINT, { method: 'POST', body: blob, keepalive: true });
-    }
-  }
-
-  function collect() {
-    const payload = {
-      url: window.location.href,
-      title: document.title,
-      referrer: document.referrer,
-      timestamp: new Date().toISOString(),
-      type: 'pageview',
-      session: getSessionId(),
-      technographics: getTechnographics(),
-      timing: getNavigationTiming(),
-      resources: getResourceSummary()
-    };
-
-    send(payload);
-  }
-
+  // Navigation timing
   function getNavigationTiming() {
     const entries = performance.getEntriesByType('navigation');
     if (!entries.length) return {};
-
     const n = entries[0];
-
     return {
-      // DNS lookup time
       dnsLookup: round(n.domainLookupEnd - n.domainLookupStart),
-      // TCP connection time
       tcpConnect: round(n.connectEnd - n.connectStart),
-      // TLS handshake (HTTPS only)
-      tlsHandshake: n.secureConnectionStart > 0
-        ? round(n.connectEnd - n.secureConnectionStart)
-        : 0,
-      // Time to First Byte
+      tlsHandshake: n.secureConnectionStart > 0 ? round(n.connectEnd - n.secureConnectionStart) : 0,
       ttfb: round(n.responseStart - n.requestStart),
-      // Download time (response)
       download: round(n.responseEnd - n.responseStart),
-      // DOM interactive (HTML parsed, not all resources loaded)
       domInteractive: round(n.domInteractive - n.fetchStart),
-      // DOM complete (all resources loaded)
       domComplete: round(n.domComplete - n.fetchStart),
-      // Full page load
       loadEvent: round(n.loadEventEnd - n.fetchStart),
-      // Total fetch time
       fetchTime: round(n.responseEnd - n.fetchStart),
-      // Transfer size and header overhead
       transferSize: n.transferSize,
       headerSize: n.transferSize - n.encodedBodySize
     };
   }
 
-  function round(n) {
-    return Math.round(n * 100) / 100;
-  }
-
+  // Resource timing
   function getResourceSummary() {
     const resources = performance.getEntriesByType('resource');
-
     const summary = {
       script:         { count: 0, totalSize: 0, totalDuration: 0 },
-      link:           { count: 0, totalSize: 0, totalDuration: 0 },  // CSS
+      link:           { count: 0, totalSize: 0, totalDuration: 0 },
       img:            { count: 0, totalSize: 0, totalDuration: 0 },
       font:           { count: 0, totalSize: 0, totalDuration: 0 },
       fetch:          { count: 0, totalSize: 0, totalDuration: 0 },
       xmlhttprequest: { count: 0, totalSize: 0, totalDuration: 0 },
       other:          { count: 0, totalSize: 0, totalDuration: 0 }
     };
-
     resources.forEach((r) => {
       const type = summary[r.initiatorType] ? r.initiatorType : 'other';
       summary[type].count++;
       summary[type].totalSize += r.transferSize || 0;
       summary[type].totalDuration += r.duration || 0;
     });
-
-    return {
-      totalResources: resources.length,
-      byType: summary
-    };
+    return { totalResources: resources.length, byType: summary };
   }
 
-  // Auto-collect once the page is loaded
-  if (document.readyState === 'complete') {
-    collect();
-  } else {
-    window.addEventListener('load', collect);
-  }
-
-    window.addEventListener('load', () => {
-    setTimeout(() => {
-      const payload = {
-        url: window.location.href,
-        type: 'pageview-detailed',
-        session: getSessionId(),
-        timing: getNavigationTiming(),
-        resources: getResourceSummary()
-      };
-      send(payload);
-    }, 0);
-  });
-
-  //LCP
-  let lcpValue = 0;
-
-  function observeLCP() {
-    const observer = new PerformanceObserver((list) => {
-      const entries = list.getEntries();
-      const lastEntry = entries[entries.length - 1];
-      // LCP uses renderTime if available, otherwise loadTime
-      lcpValue = lastEntry.renderTime || lastEntry.loadTime;
-    });
-    observer.observe({ type: 'largest-contentful-paint', buffered: true });
-    return observer;
-  }
-
-  //CLS
-  let clsValue = 0;
-
-  function observeCLS() {
-    const observer = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        // Only count shifts without recent user input
-        if (!entry.hadRecentInput) {
-          clsValue += entry.value;
+  // Web Vitals
+  function initWebVitals() {
+    try {
+      const lcpObs = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        if (entries.length) {
+          vitals.lcp = round(entries[entries.length - 1].startTime);
         }
-      }
-    });
-    observer.observe({ type: 'layout-shift', buffered: true });
-    return observer;
-  }
-
-  //INP 
-  let inpValue = 0;
-
-  function observeINP() {
-    const interactions = [];
-
-    const observer = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        // event entries with interactionId represent user interactions
-        if (entry.interactionId) {
-          interactions.push(entry.duration);
-        }
-      }
-      // INP is the worst interaction (simplified)
-      // The actual algorithm uses the 98th percentile
-      if (interactions.length > 0) {
-        interactions.sort((a, b) => b - a);
-        inpValue = interactions[0];
-      }
-    });
-    observer.observe({ type: 'event', buffered: true, durationThreshold: 16 });
-    return observer;
-  }
-
-  const thresholds = {
-  lcp: [2500, 4000],
-  cls: [0.1, 0.25],
-  inp: [200, 500]
-  };
-
-  function getVitalsScore(metric, value) {
-    const t = thresholds[metric];
-    if (!t) return null;
-    if (value <= t[0]) return 'good';
-    if (value <= t[1]) return 'needsImprovement';
-    return 'poor';
-  }
-
-  document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') {
-    sendVitals();
-  }
-});
-
-  function sendVitals() {
-    const vitals = {
-      lcp: { value: round(lcpValue), score: getVitalsScore('lcp', lcpValue) },
-      cls: { value: round(clsValue * 1000) / 1000, score: getVitalsScore('cls', clsValue) },
-      inp: { value: round(inpValue), score: getVitalsScore('inp', inpValue) }
-    };
-    send({
-      type: 'vitals',
-      vitals: vitals,
-      url: window.location.href,
-      timestamp: new Date().toISOString()
-    });
-  }
-
-  // Start observers immediately (they buffer past entries)
-  const lcpObserver = observeLCP();
-  const clsObserver = observeCLS();
-  const inpObserver = observeINP();
-
-  // Initial beacon: timing + technographics (same as v4)
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      collect();
-    }, 0);
-  });
-
-  // Vitals beacon: final values when page is hidden
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-      sendVitals();
-    }
-  });
-
-  window.addEventListener('error', (event) => {
-  // event is an ErrorEvent when it's a JS error
-    if (event instanceof ErrorEvent) {
-      reportError({
-        type: 'js-error',
-        message: event.message,
-        source: event.filename,
-        line: event.lineno,
-        column: event.colno,
-        stack: event.error ? event.error.stack : '',
-        url: window.location.href
       });
-    }
-  });
+      lcpObs.observe({ type: 'largest-contentful-paint', buffered: true });
+    } catch (e) {}
 
-  window.addEventListener('unhandledrejection', (event) => {
-    const reason = event.reason;
-    reportError({
-      type: 'promise-rejection',
-      message: reason instanceof Error ? reason.message : String(reason),
-      stack: reason instanceof Error ? reason.stack : '',
-      url: window.location.href
-    });
-  });
-
-  window.addEventListener('error', (event) => {
-  // Resource errors bubble up as plain Events (not ErrorEvent)
-    if (!(event instanceof ErrorEvent)) {
-      const target = event.target;
-      if (target && (target.tagName === 'IMG' || target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
-        reportError({
-          type: 'resource-error',
-          tagName: target.tagName,
-          src: target.src || target.href || '',
-          url: window.location.href
+    try {
+      const clsObs = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+          if (!entry.hadRecentInput) {
+            vitals.cls = round(vitals.cls + entry.value);
+          }
         });
-      }
-    }
-  }, true); // Note: must use capture phase!
+      });
+      clsObs.observe({ type: 'layout-shift', buffered: true });
+    } catch (e) {}
 
+    try {
+      const inpObs = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+          if (vitals.inp === null || entry.duration > vitals.inp) {
+            vitals.inp = round(entry.duration);
+          }
+        });
+      });
+      inpObs.observe({ type: 'event', buffered: true, durationThreshold: 16 });
+    } catch (e) {}
+  }
 
+  function getWebVitals() {
+    return { lcp: vitals.lcp, cls: vitals.cls, inp: vitals.inp };
+  }
+
+  // Error tracking
   function reportError(errorData) {
-    // Rate limit
     if (errorCount >= MAX_ERRORS) return;
 
-    // Deduplicate by message + source + line
-    const key = `${errorData.type}:${errorData.message}:${errorData.source || ''}:${errorData.line || ''}`;
+    const key = `${errorData.type}:${errorData.message || ''}:${errorData.source || ''}:${errorData.line || ''}`;
     if (reportedErrors.has(key)) return;
     reportedErrors.add(key);
     errorCount++;
 
-    // Send error beacon
     send({
       type: 'error',
       error: errorData,
       timestamp: new Date().toISOString(),
-      url: window.location.href
+      url: window.location.href,
+      session: getSessionId()
+    });
+
+    window.dispatchEvent(new CustomEvent('collector:error', {
+      detail: { errorData: errorData, count: errorCount }
+    }));
+  }
+
+  function initErrorTracking() {
+    window.addEventListener('error', (event) => {
+      if (event instanceof ErrorEvent) {
+        reportError({
+          type: 'js-error',
+          message: event.message,
+          source: event.filename,
+          line: event.lineno,
+          column: event.colno,
+          stack: event.error ? event.error.stack : '',
+          url: window.location.href
+        });
+      } else {
+        const target = event.target;
+        if (target && (target.tagName === 'IMG' || target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
+          reportError({
+            type: 'resource-error',
+            tagName: target.tagName,
+            src: target.src || target.href || '',
+            url: window.location.href
+          });
+        }
+      }
+    }, true);
+
+    window.addEventListener('unhandledrejection', (event) => {
+      const reason = event.reason;
+      reportError({
+        type: 'promise-rejection',
+        message: reason instanceof Error ? reason.message : String(reason),
+        stack: reason instanceof Error ? reason.stack : '',
+        url: window.location.href
+      });
     });
   }
 
-  const collector = (function() {
-    'use strict';
+  // Retry queue
+  function queueForRetry(payload) {
+    try {
+      const queue = JSON.parse(sessionStorage.getItem('_collector_retry') || '[]');
+      if (queue.length >= 50) return;
+      queue.push(payload);
+      sessionStorage.setItem('_collector_retry', JSON.stringify(queue));
+    } catch (e) {}
+  }
 
-    // Private state -- not accessible outside
-    let config = {};
-    let initialized = false;
-    const globalProps = {};
+  function processRetryQueue() {
+    try {
+      const queue = JSON.parse(sessionStorage.getItem('_collector_retry') || '[]');
+      if (!queue.length) return;
+      sessionStorage.removeItem('_collector_retry');
+      queue.forEach((payload) => { send(payload); });
+    } catch (e) {}
+  }
 
-    // Private functions
-    function send(payload) { /* ... */ }
-    function buildPayload(eventName) { /* ... */ }
-    function getSessionId() { /* ... */ }
-    function getTechnographics() { /* ... */ }
-    function getNavigationTiming() { /* ... */ }
-    // ... all the internal machinery
+  // Payload delivery
+  function send(payload) {
+    const markSupported = typeof performance.mark === 'function';
+    if (markSupported) {
+      performance.mark('collector_send_start');
+    }
 
-    // Public API -- returned at the end
-    return {
-      init:     function(options) { /* ... */ },
-      track:    function(event, data) { /* ... */ },
-      set:      function(key, value) { /* ... */ },
-      identify: function(userId) { /* ... */ }
-    };
-  })();
-
-  const defaults = {
-    endpoint: '/collect',
-    enableTechnographics: true,
-    enableTiming: true,
-    enableVitals: true,
-    enableErrors: true,
-    sampleRate: 1.0,      // 1.0 = 100% of sessions
-    debug: false           // true = log to console instead of sending
-  };
-
-  function init(options) {
-    if (initialized) {
-      warn('collector.init() called more than once');
+    if (config.debug) {
+      console.log('[Collector] Debug payload:', payload);
       return;
     }
 
-    // Merge user options with defaults
-    config = {};
-    for (const key of Object.keys(defaults)) {
-      config[key] = (options && options[key] !== undefined)
-        ? options[key]
-        : defaults[key];
-    }
-
-    // Sampling: decide once per session whether to collect
-    if (!shouldSample()) {
-      log(`Session not sampled (rate: ${config.sampleRate})`);
+    if (!config.endpoint) {
+      console.warn('[Collector] No endpoint configured');
       return;
     }
 
-    initialized = true;
+    const json = JSON.stringify(payload);
+    let sent = false;
 
-    // Start automatic collection based on config
-    if (config.enableErrors) initErrorTracking();
-    if (config.enableVitals) initVitalsObservers();
-
-    // Fire pageview beacon after load
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const payload = buildPayload('pageview');
-        if (config.enableTiming) payload.timing = getNavigationTiming();
-        if (config.enableTiming) payload.resources = getResourceSummary();
-        if (config.enableTechnographics) payload.technographics = getTechnographics();
-        send(payload);
-      }, 0);
-    });
-
-    log('Collector initialized', config);
-  }
-
-
-  function shouldSample() {
-    // Check session storage first -- sampling is per-session, not per-page
-    const sampled = sessionStorage.getItem('_collector_sampled');
-    if (sampled !== null) return sampled === 'true';
-
-    // Roll the dice once per session
-    const result = Math.random() < config.sampleRate;
-    sessionStorage.setItem('_collector_sampled', String(result));
-    return result;
-  }
-
-  function track(eventName, data) {
-    if (!initialized) {
-      warn('collector.track() called before init()');
-      return;
+    if (navigator.sendBeacon) {
+      sent = navigator.sendBeacon(
+        config.endpoint,
+        new Blob([json], { type: 'application/json' })
+      );
     }
-    const payload = buildPayload(eventName);
-    if (data) payload.data = data;
-    send(payload);
+
+    if (!sent) {
+      fetch(config.endpoint, {
+        method: 'POST',
+        body: json,
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true
+      }).catch(() => {
+        queueForRetry(payload);
+      });
+    }
+
+    if (markSupported) {
+      performance.mark('collector_send_end');
+      performance.measure('collector_send', 'collector_send_start', 'collector_send_end');
+    }
+
+    window.dispatchEvent(new CustomEvent('collector:beacon', { detail: payload }));
   }
 
-  function set(key, value) {
-    globalProps[key] = value;
-  }
-
-  function buildPayload(eventName) {
-    const payload = {
+  // Full pageview payload
+  function collect(type) {
+    let payload = {
+      type: type || 'pageview',
       url: window.location.href,
       title: document.title,
       referrer: document.referrer,
       timestamp: new Date().toISOString(),
-      type: eventName,
-      session: getSessionId()
+      session: getSessionId(),
+      technographics: getTechnographics(),
+      timing: getNavigationTiming(),
+      resources: getResourceSummary(),
+      vitals: getWebVitals(),
+      errorCount: errorCount,
+      customData: customData
     };
-    // Merge global properties
-    for (const k of Object.keys(globalProps)) {
-      payload[k] = globalProps[k];
-    }
-    return payload;
-  }
 
-  function identify(userId) {
-    globalProps.userId = userId;
-    log('User identified:', userId);
-  }
-
-  function log(...args) {
-    if (config.debug) {
-      console.log('[Collector]', ...args);
-    }
-  }
-
-  function warn(...args) {
-    console.warn('[Collector]', ...args);
-  }
-
-  function send(payload) {
-    if (config.debug) {
-      console.log('[Collector] Would send:', payload);
-      return; // Don't actually send in debug mode
+    if (userId) {
+      payload.userId = userId;
     }
 
-    // ... actual sendBeacon/fetch logic
-    const blob = new Blob(
-      [JSON.stringify(payload)],
-      { type: 'application/json' }
-    );
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(config.endpoint, blob);
-    } else {
-      fetch(config.endpoint, {
-        method: 'POST',
-        body: blob,
-        keepalive: true
-      }).catch((err) => {
-        warn('Send failed:', err.message);
-      });
-    }
-  }  
+    plugins.forEach((plugin) => {
+      if (typeof plugin.beforeSend === 'function') {
+        const result = plugin.beforeSend(payload);
+        if (result === false) return;
+        if (result && typeof result === 'object') {
+          payload = result;
+        }
+      }
+    });
 
-  collector.init({
-    endpoint: '/collect',
-    debug: true    // Logs to console, no network requests
-  });
+    send(payload);
+
+    window.dispatchEvent(new CustomEvent('collector:payload', { detail: payload }));
+  }
+
+  // Time-on-page
+  function initTimeOnPage() {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        totalVisibleTime += Date.now() - pageShowTime;
+
+        const exitPayload = {
+          type: 'page_exit',
+          url: window.location.href,
+          timeOnPage: totalVisibleTime,
+          vitals: getWebVitals(),
+          errorCount: errorCount,
+          timestamp: new Date().toISOString(),
+          session: getSessionId()
+        };
+
+        plugins.forEach((plugin) => {
+          if (typeof plugin.onExit === 'function') {
+            plugin.onExit(exitPayload);
+          }
+        });
+
+        send(exitPayload);
+      } else {
+        pageShowTime = Date.now();
+      }
+    });
+  }
+
+  // Command queue
+  function processQueue() {
+    const queue = window._cq || [];
+    for (const args of queue) {
+      const method = args[0];
+      const params = args.slice(1);
+      if (typeof publicAPI[method] === 'function') {
+        publicAPI[method](...params);
+      }
+    }
+    window._cq = {
+      push: (args) => {
+        const method = args[0];
+        const params = args.slice(1);
+        if (typeof publicAPI[method] === 'function') {
+          publicAPI[method](...params);
+        }
+      }
+    };
+  }
+
+  // Public API
+  const publicAPI = {
+    init: function (options) {
+      if (initialized) {
+        console.warn('[Collector] Already initialized');
+        return;
+      }
+
+      if (typeof performance.mark === 'function') {
+        performance.mark('collector_init_start');
+      }
+
+      if (options) merge(config, options);
+
+      if (config.respectConsent && !hasConsent()) {
+        console.log('[Collector] No consent — collection disabled');
+        blocked = true;
+        initialized = true;
+        return;
+      }
+
+      if (config.detectBots && isBot()) {
+        console.log('[Collector] Bot detected — collection disabled');
+        blocked = true;
+        initialized = true;
+        return;
+      }
+
+      if (!isSampled()) {
+        console.log(`[Collector] Session not sampled (rate: ${config.sampleRate})`);
+        blocked = true;
+        initialized = true;
+        return;
+      }
+
+      initialized = true;
+      console.log('[Collector] Initialized', config);
+
+      if (config.enableVitals) initWebVitals();
+      if (config.enableErrors) initErrorTracking();
+      initTimeOnPage();
+
+      processRetryQueue();
+
+      if (document.readyState === 'complete') {
+        setTimeout(() => { collect('pageview'); }, 0);
+      } else {
+        window.addEventListener('load', () => {
+          setTimeout(() => { collect('pageview'); }, 0);
+        });
+      }
+
+      if (typeof performance.mark === 'function') {
+        performance.mark('collector_init_end');
+        performance.measure('collector_init', 'collector_init_start', 'collector_init_end');
+      }
+    },
+
+    track: function (eventName, eventData) {
+      if (!initialized || blocked) return;
+      const payload = {
+        type: 'event',
+        event: eventName,
+        data: eventData || {},
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        session: getSessionId(),
+        customData: customData
+      };
+      if (userId) payload.userId = userId;
+      send(payload);
+    },
+
+    set: function (key, value) {
+      customData[key] = value;
+    },
+
+    identify: function (id) {
+      userId = id;
+    },
+
+    use: function (plugin) {
+      if (!plugin || typeof plugin !== 'object') {
+        console.warn('[Collector] Invalid plugin');
+        return;
+      }
+      plugins.push(plugin);
+      if (typeof plugin.init === 'function') {
+        plugin.init(config);
+      }
+      console.log(`[Collector] Plugin registered: ${plugin.name || '(unnamed)'}`);
+    }
+  };
+
+  // Bootstrap
+  processQueue();
+
+  // Test hooks
+  window.__collector = {
+    getNavigationTiming: getNavigationTiming,
+    getResourceSummary: getResourceSummary,
+    getTechnographics: getTechnographics,
+    getWebVitals: getWebVitals,
+    getSessionId: getSessionId,
+    getNetworkInfo: getNetworkInfo,
+    reportError: reportError,
+    collect: collect,
+    hasConsent: hasConsent,
+    isBot: isBot,
+    isSampled: isSampled,
+    getErrorCount: () => errorCount,
+    getConfig: () => config,
+    isBlocked: () => blocked,
+    api: publicAPI
+  };
+
 })();
