@@ -43,17 +43,8 @@
     };
   }
 
-  function collect() {
-    const payload = {
-      url: window.location.href,
-      title: document.title,
-      referrer: document.referrer,
-      timestamp: new Date().toISOString(),
-      type: 'pageview',
-      session: getSessionId(),
-      technographics: getTechnographics(),
-    };
-
+  // 🔹 New: wrap the blob / beacon logic in a function
+  function send(payload) {
     const blob = new Blob([JSON.stringify(payload)], {
       type: 'application/json',
     });
@@ -65,9 +56,103 @@
     }
   }
 
+  function collect() {
+    const payload = {
+      url: window.location.href,
+      title: document.title,
+      referrer: document.referrer,
+      timestamp: new Date().toISOString(),
+      type: 'pageview',
+      session: getSessionId(),
+      technographics: getTechnographics(),
+      timing: getNavigationTiming(),
+      resources: getResourceSummary()
+    };
+
+    send(payload);
+  }
+
+  function getNavigationTiming() {
+    const entries = performance.getEntriesByType('navigation');
+    if (!entries.length) return {};
+
+    const n = entries[0];
+
+    return {
+      // DNS lookup time
+      dnsLookup: round(n.domainLookupEnd - n.domainLookupStart),
+      // TCP connection time
+      tcpConnect: round(n.connectEnd - n.connectStart),
+      // TLS handshake (HTTPS only)
+      tlsHandshake: n.secureConnectionStart > 0
+        ? round(n.connectEnd - n.secureConnectionStart)
+        : 0,
+      // Time to First Byte
+      ttfb: round(n.responseStart - n.requestStart),
+      // Download time (response)
+      download: round(n.responseEnd - n.responseStart),
+      // DOM interactive (HTML parsed, not all resources loaded)
+      domInteractive: round(n.domInteractive - n.fetchStart),
+      // DOM complete (all resources loaded)
+      domComplete: round(n.domComplete - n.fetchStart),
+      // Full page load
+      loadEvent: round(n.loadEventEnd - n.fetchStart),
+      // Total fetch time
+      fetchTime: round(n.responseEnd - n.fetchStart),
+      // Transfer size and header overhead
+      transferSize: n.transferSize,
+      headerSize: n.transferSize - n.encodedBodySize
+    };
+  }
+
+  function round(n) {
+    return Math.round(n * 100) / 100;
+  }
+
+  function getResourceSummary() {
+    const resources = performance.getEntriesByType('resource');
+
+    const summary = {
+      script:         { count: 0, totalSize: 0, totalDuration: 0 },
+      link:           { count: 0, totalSize: 0, totalDuration: 0 },  // CSS
+      img:            { count: 0, totalSize: 0, totalDuration: 0 },
+      font:           { count: 0, totalSize: 0, totalDuration: 0 },
+      fetch:          { count: 0, totalSize: 0, totalDuration: 0 },
+      xmlhttprequest: { count: 0, totalSize: 0, totalDuration: 0 },
+      other:          { count: 0, totalSize: 0, totalDuration: 0 }
+    };
+
+    resources.forEach((r) => {
+      const type = summary[r.initiatorType] ? r.initiatorType : 'other';
+      summary[type].count++;
+      summary[type].totalSize += r.transferSize || 0;
+      summary[type].totalDuration += r.duration || 0;
+    });
+
+    return {
+      totalResources: resources.length,
+      byType: summary
+    };
+  }
+
+  // Auto-collect once the page is loaded
   if (document.readyState === 'complete') {
     collect();
   } else {
     window.addEventListener('load', collect);
   }
+  
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const payload = {
+        url: window.location.href,
+        type: 'pageview-detailed',
+        session: getSessionId(),
+        timing: getNavigationTiming(),
+        resources: getResourceSummary()
+      };
+      send(payload);
+    }, 0);
+  });
+
 })();
