@@ -322,4 +322,164 @@
     });
   }
 
+  const collector = (function() {
+    'use strict';
+
+    // Private state -- not accessible outside
+    let config = {};
+    let initialized = false;
+    const globalProps = {};
+
+    // Private functions
+    function send(payload) { /* ... */ }
+    function buildPayload(eventName) { /* ... */ }
+    function getSessionId() { /* ... */ }
+    function getTechnographics() { /* ... */ }
+    function getNavigationTiming() { /* ... */ }
+    // ... all the internal machinery
+
+    // Public API -- returned at the end
+    return {
+      init:     function(options) { /* ... */ },
+      track:    function(event, data) { /* ... */ },
+      set:      function(key, value) { /* ... */ },
+      identify: function(userId) { /* ... */ }
+    };
+  })();
+
+  const defaults = {
+    endpoint: '/collect',
+    enableTechnographics: true,
+    enableTiming: true,
+    enableVitals: true,
+    enableErrors: true,
+    sampleRate: 1.0,      // 1.0 = 100% of sessions
+    debug: false           // true = log to console instead of sending
+  };
+
+  function init(options) {
+    if (initialized) {
+      warn('collector.init() called more than once');
+      return;
+    }
+
+    // Merge user options with defaults
+    config = {};
+    for (const key of Object.keys(defaults)) {
+      config[key] = (options && options[key] !== undefined)
+        ? options[key]
+        : defaults[key];
+    }
+
+    // Sampling: decide once per session whether to collect
+    if (!shouldSample()) {
+      log(`Session not sampled (rate: ${config.sampleRate})`);
+      return;
+    }
+
+    initialized = true;
+
+    // Start automatic collection based on config
+    if (config.enableErrors) initErrorTracking();
+    if (config.enableVitals) initVitalsObservers();
+
+    // Fire pageview beacon after load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const payload = buildPayload('pageview');
+        if (config.enableTiming) payload.timing = getNavigationTiming();
+        if (config.enableTiming) payload.resources = getResourceSummary();
+        if (config.enableTechnographics) payload.technographics = getTechnographics();
+        send(payload);
+      }, 0);
+    });
+
+    log('Collector initialized', config);
+  }
+
+
+  function shouldSample() {
+    // Check session storage first -- sampling is per-session, not per-page
+    const sampled = sessionStorage.getItem('_collector_sampled');
+    if (sampled !== null) return sampled === 'true';
+
+    // Roll the dice once per session
+    const result = Math.random() < config.sampleRate;
+    sessionStorage.setItem('_collector_sampled', String(result));
+    return result;
+  }
+
+  function track(eventName, data) {
+    if (!initialized) {
+      warn('collector.track() called before init()');
+      return;
+    }
+    const payload = buildPayload(eventName);
+    if (data) payload.data = data;
+    send(payload);
+  }
+
+  function set(key, value) {
+    globalProps[key] = value;
+  }
+
+  function buildPayload(eventName) {
+    const payload = {
+      url: window.location.href,
+      title: document.title,
+      referrer: document.referrer,
+      timestamp: new Date().toISOString(),
+      type: eventName,
+      session: getSessionId()
+    };
+    // Merge global properties
+    for (const k of Object.keys(globalProps)) {
+      payload[k] = globalProps[k];
+    }
+    return payload;
+  }
+
+  function identify(userId) {
+    globalProps.userId = userId;
+    log('User identified:', userId);
+  }
+
+  function log(...args) {
+    if (config.debug) {
+      console.log('[Collector]', ...args);
+    }
+  }
+
+  function warn(...args) {
+    console.warn('[Collector]', ...args);
+  }
+
+  function send(payload) {
+    if (config.debug) {
+      console.log('[Collector] Would send:', payload);
+      return; // Don't actually send in debug mode
+    }
+
+    // ... actual sendBeacon/fetch logic
+    const blob = new Blob(
+      [JSON.stringify(payload)],
+      { type: 'application/json' }
+    );
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(config.endpoint, blob);
+    } else {
+      fetch(config.endpoint, {
+        method: 'POST',
+        body: blob,
+        keepalive: true
+      }).catch((err) => {
+        warn('Send failed:', err.message);
+      });
+    }
+  }  
+
+  collector.init({
+    endpoint: '/collect',
+    debug: true    // Logs to console, no network requests
+  });
 })();
