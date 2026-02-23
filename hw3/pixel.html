@@ -1,0 +1,13 @@
+<!-- Basic tracking pixel -->
+<img src="https://analytics.example.com/pixel.php?page=/home&t=pageview"
+     width="1" height="1" alt="" style="position:absolute;left:-9999px">
+
+<!-- With cache-busting (prevents browser from caching the pixel) -->
+<img src="https://analytics.example.com/pixel.php?page=/home&r=1706123456789"
+     width="1" height="1" alt="">
+
+<!-- noscript fallback — works even when JavaScript is disabled -->
+<noscript>
+  <img src="https://analytics.example.com/pixel.php?page=/home&js=0"
+       width="1" height="1" alt="">
+</noscript>
