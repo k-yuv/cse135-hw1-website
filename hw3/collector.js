@@ -141,8 +141,8 @@
   } else {
     window.addEventListener('load', collect);
   }
-  
-  window.addEventListener('load', () => {
+
+    window.addEventListener('load', () => {
     setTimeout(() => {
       const payload = {
         url: window.location.href,
@@ -154,5 +154,172 @@
       send(payload);
     }, 0);
   });
+
+  //LCP
+  let lcpValue = 0;
+
+  function observeLCP() {
+    const observer = new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+      const lastEntry = entries[entries.length - 1];
+      // LCP uses renderTime if available, otherwise loadTime
+      lcpValue = lastEntry.renderTime || lastEntry.loadTime;
+    });
+    observer.observe({ type: 'largest-contentful-paint', buffered: true });
+    return observer;
+  }
+
+  //CLS
+  let clsValue = 0;
+
+  function observeCLS() {
+    const observer = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        // Only count shifts without recent user input
+        if (!entry.hadRecentInput) {
+          clsValue += entry.value;
+        }
+      }
+    });
+    observer.observe({ type: 'layout-shift', buffered: true });
+    return observer;
+  }
+
+  //INP 
+  let inpValue = 0;
+
+  function observeINP() {
+    const interactions = [];
+
+    const observer = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        // event entries with interactionId represent user interactions
+        if (entry.interactionId) {
+          interactions.push(entry.duration);
+        }
+      }
+      // INP is the worst interaction (simplified)
+      // The actual algorithm uses the 98th percentile
+      if (interactions.length > 0) {
+        interactions.sort((a, b) => b - a);
+        inpValue = interactions[0];
+      }
+    });
+    observer.observe({ type: 'event', buffered: true, durationThreshold: 16 });
+    return observer;
+  }
+
+  const thresholds = {
+  lcp: [2500, 4000],
+  cls: [0.1, 0.25],
+  inp: [200, 500]
+  };
+
+  function getVitalsScore(metric, value) {
+    const t = thresholds[metric];
+    if (!t) return null;
+    if (value <= t[0]) return 'good';
+    if (value <= t[1]) return 'needsImprovement';
+    return 'poor';
+  }
+
+  document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    sendVitals();
+  }
+});
+
+  function sendVitals() {
+    const vitals = {
+      lcp: { value: round(lcpValue), score: getVitalsScore('lcp', lcpValue) },
+      cls: { value: round(clsValue * 1000) / 1000, score: getVitalsScore('cls', clsValue) },
+      inp: { value: round(inpValue), score: getVitalsScore('inp', inpValue) }
+    };
+    send({
+      type: 'vitals',
+      vitals: vitals,
+      url: window.location.href,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  // Start observers immediately (they buffer past entries)
+  const lcpObserver = observeLCP();
+  const clsObserver = observeCLS();
+  const inpObserver = observeINP();
+
+  // Initial beacon: timing + technographics (same as v4)
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      collect();
+    }, 0);
+  });
+
+  // Vitals beacon: final values when page is hidden
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      sendVitals();
+    }
+  });
+
+  window.addEventListener('error', (event) => {
+  // event is an ErrorEvent when it's a JS error
+    if (event instanceof ErrorEvent) {
+      reportError({
+        type: 'js-error',
+        message: event.message,
+        source: event.filename,
+        line: event.lineno,
+        column: event.colno,
+        stack: event.error ? event.error.stack : '',
+        url: window.location.href
+      });
+    }
+  });
+
+  window.addEventListener('unhandledrejection', (event) => {
+    const reason = event.reason;
+    reportError({
+      type: 'promise-rejection',
+      message: reason instanceof Error ? reason.message : String(reason),
+      stack: reason instanceof Error ? reason.stack : '',
+      url: window.location.href
+    });
+  });
+
+  window.addEventListener('error', (event) => {
+  // Resource errors bubble up as plain Events (not ErrorEvent)
+    if (!(event instanceof ErrorEvent)) {
+      const target = event.target;
+      if (target && (target.tagName === 'IMG' || target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
+        reportError({
+          type: 'resource-error',
+          tagName: target.tagName,
+          src: target.src || target.href || '',
+          url: window.location.href
+        });
+      }
+    }
+  }, true); // Note: must use capture phase!
+
+
+  function reportError(errorData) {
+    // Rate limit
+    if (errorCount >= MAX_ERRORS) return;
+
+    // Deduplicate by message + source + line
+    const key = `${errorData.type}:${errorData.message}:${errorData.source || ''}:${errorData.line || ''}`;
+    if (reportedErrors.has(key)) return;
+    reportedErrors.add(key);
+    errorCount++;
+
+    // Send error beacon
+    send({
+      type: 'error',
+      error: errorData,
+      timestamp: new Date().toISOString(),
+      url: window.location.href
+    });
+  }
 
 })();
