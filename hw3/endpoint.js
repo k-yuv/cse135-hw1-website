@@ -10,7 +10,7 @@ const LOG_FILE = path.join(__dirname, 'analytics.jsonl');
 // Database connection
 const db = new Pool({
   host: 'localhost',
-  database: 'collector_cse135',
+  database: 'postgres',
   user: 'postgres',
   password: 'Sanrio135Cse',
   port: 5432
