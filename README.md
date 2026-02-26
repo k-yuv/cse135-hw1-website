@@ -59,3 +59,5 @@ Naturally, Apache cannot change the server name, so I had to search how to chang
 
 Following the guide on this link I installed mod security, and I enabled it. It's known as a sever signature, so that is why you see CSE 135 Server.
 
+# Homework 3 
+Sessioning: To collect data on a specific user, we implemented getSessionId which is a unique number this user has. This ID is stored in storage. The user's activity is tracked like how much time they're idle for, mouse movement, keyboard clicks, etc. All the information in the payload is sent to an endpoint designated for our server. 
