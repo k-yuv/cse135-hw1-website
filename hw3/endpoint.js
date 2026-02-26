@@ -1,14 +1,22 @@
-//step 1
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = 3005;
 const LOG_FILE = path.join(__dirname, 'analytics.jsonl');
 
-//step 2
-// CORS headers — required when collector and endpoint are on different origins
+// Database connection
+const db = new Pool({
+  host: 'localhost',
+  database: 'collector_cse135',
+  user: 'postgres',
+  password: 'Sanrio135Cse',
+  port: 5432
+});
+
+// CORS headers
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -19,40 +27,113 @@ app.use((req, res, next) => {
   next();
 });
 
-//step 3
 app.use(express.json());
 
-//step 4 
-app.post('/collect', (req, res) => {
+app.post('/collect', async (req, res) => {
   const payload = req.body;
 
-  // Validate: must have url and type at minimum
   if (!payload || !payload.url || !payload.type) {
     return res.status(400).json({ error: 'Missing required fields: url, type' });
   }
 
-  // Add server-side timestamp (client clocks can be wrong)
   payload.serverTimestamp = new Date().toISOString();
-
-  // Add IP address (Express provides this)
   payload.ip = req.ip;
 
-  // Append to JSON Lines file
+  // Keep writing to file as backup
   const line = JSON.stringify(payload) + '\n';
   fs.appendFile(LOG_FILE, line, (err) => {
-    if (err) {
-      console.error('Write error:', err);
-      return res.sendStatus(500);
-    }
-    res.sendStatus(204); // No Content — success, nothing to return
+    if (err) console.error('File write error:', err);
   });
+
+  const session_id = payload.session;
+  const url = payload.url;
+  const server_timestamp = new Date();
+  const client_ip = req.ip;
+  const type = payload.type;
+
+  try {
+    if (type === 'pageview') {
+      await db.query(`
+        INSERT INTO pageviews
+          (url, type, user_agent, viewport_width, viewport_height, referrer,
+           client_timestamp, server_timestamp, client_ip, session_id, payload)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+      `, [
+        url,
+        type,
+        payload.technographics?.userAgent,
+        payload.technographics?.viewportWidth,
+        payload.technographics?.viewportHeight,
+        payload.referrer,
+        payload.timestamp ? Date.parse(payload.timestamp) : null,
+        server_timestamp,
+        client_ip,
+        session_id,
+        JSON.stringify(payload)
+      ]);
+
+    } else if (type === 'event') {
+      await db.query(`
+        INSERT INTO events
+          (session_id, event_name, event_category, event_data, url, server_timestamp)
+        VALUES ($1,$2,$3,$4,$5,$6)
+      `, [
+        session_id,
+        payload.event,
+        payload.data?.category || null,
+        JSON.stringify(payload.data || {}),
+        url,
+        server_timestamp
+      ]);
+
+    } else if (type === 'error') {
+      await db.query(`
+        INSERT INTO errors
+          (session_id, error_message, error_source, error_line, error_column,
+           stack_trace, url, user_agent, server_timestamp)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      `, [
+        session_id,
+        payload.error?.message,
+        payload.error?.source,
+        payload.error?.line,
+        payload.error?.column,
+        payload.error?.stack,
+        url,
+        payload.technographics?.userAgent || null,
+        server_timestamp
+      ]);
+
+    } else if (type === 'page_exit') {
+      await db.query(`
+        INSERT INTO performance
+          (session_id, url, ttfb, dom_content_loaded, load_time,
+           lcp, cls, inp, server_timestamp)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      `, [
+        session_id,
+        url,
+        payload.timing?.ttfb,
+        payload.timing?.domComplete,
+        payload.timing?.loadEvent,
+        payload.vitals?.lcp,
+        payload.vitals?.cls,
+        payload.vitals?.inp,
+        server_timestamp
+      ]);
+    }
+
+    res.sendStatus(204);
+
+  } catch (err) {
+    console.error('DB insert failed:', err);
+    res.sendStatus(500);
+  }
 });
 
-//step 5
 app.use(express.static(__dirname));
 
 app.listen(PORT, () => {
   console.log(`Analytics endpoint listening on http://localhost:${PORT}`);
-  console.log(`Test page: http://localhost:${PORT}/test.html`);
   console.log(`Data file: ${LOG_FILE}`);
 });

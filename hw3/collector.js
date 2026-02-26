@@ -537,4 +537,10 @@
     api: publicAPI
   };
 
+  _cq.push(['init', {
+    endpoint: '/log',
+    enableVitals: true,
+    enableErrors: true
+  }]);
+
 })();
