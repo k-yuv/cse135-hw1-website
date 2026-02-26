@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // ----------------------------
 // Database connection
 // ----------------------------
-$dsn = "pgsql:host=127.0.0.1;port=5432;dbname=collector_cse135;";
+$dsn = "pgsql:host=127.0.0.1;port=5432;dbname=postgres;";
 $user = "postgres";
 $password = "Sanrio135Cse";
 
