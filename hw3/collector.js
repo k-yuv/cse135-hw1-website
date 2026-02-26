@@ -128,29 +128,38 @@
       memory: navigator.deviceMemory || 0,
       network: getNetworkInfo(),
       colorScheme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      allowJS: true,
+      allowCSS: true,
+      allowImage: true
     };
   }
 
   // Navigation timing
   function getNavigationTiming() {
-    const entries = performance.getEntriesByType('navigation');
-    if (!entries.length) return {};
-    const n = entries[0];
-    return {
-      dnsLookup: round(n.domainLookupEnd - n.domainLookupStart),
-      tcpConnect: round(n.connectEnd - n.connectStart),
-      tlsHandshake: n.secureConnectionStart > 0 ? round(n.connectEnd - n.secureConnectionStart) : 0,
-      ttfb: round(n.responseStart - n.requestStart),
-      download: round(n.responseEnd - n.responseStart),
-      domInteractive: round(n.domInteractive - n.fetchStart),
-      domComplete: round(n.domComplete - n.fetchStart),
-      loadEvent: round(n.loadEventEnd - n.fetchStart),
-      fetchTime: round(n.responseEnd - n.fetchStart),
-      transferSize: n.transferSize,
-      headerSize: n.transferSize - n.encodedBodySize
-    };
-  }
+      const entries = performance.getEntriesByType('navigation');
+      if (!entries.length) return {};
+      const n = entries[0];
+      return {
+        dnsLookup: round(n.domainLookupEnd - n.domainLookupStart),
+        tcpConnect: round(n.connectEnd - n.connectStart),
+        tlsHandshake: n.secureConnectionStart > 0 ? round(n.connectEnd - n.secureConnectionStart) : 0,
+        ttfb: round(n.responseStart - n.requestStart),
+        download: round(n.responseEnd - n.responseStart),
+        domInteractive: round(n.domInteractive - n.fetchStart),
+        domComplete: round(n.domComplete - n.fetchStart),
+        loadEvent: round(n.loadEventEnd - n.fetchStart),
+        fetchTime: round(n.responseEnd - n.fetchStart),
+        transferSize: n.transferSize,
+        headerSize: n.transferSize - n.encodedBodySize,
+        legacyTiming: performance.timing ? {
+          full: performance.timing.toJSON ? performance.timing.toJSON() : {},
+          startTime: performance.timing.navigationStart,
+          endTime: performance.timing.loadEventEnd,
+          totalLoadMs: performance.timing.loadEventEnd - performance.timing.navigationStart
+        } : null
+      };
+    }
 
   // Resource timing
   function getResourceSummary() {
@@ -373,6 +382,13 @@
 
   // Time-on-page
   function initTimeOnPage() {
+    send({
+      type: 'page_enter',
+      url: window.location.href,
+      timestamp: new Date().toISOString(),
+      session: getSessionId()
+    });
+
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         totalVisibleTime += Date.now() - pageShowTime;
@@ -462,6 +478,7 @@
       if (config.enableVitals) initWebVitals();
       if (config.enableErrors) initErrorTracking();
       initTimeOnPage();
+      initActivityTracking();
 
       processRetryQueue();
 
@@ -514,6 +531,74 @@
       console.log(`[Collector] Plugin registered: ${plugin.name || '(unnamed)'}`);
     }
   };
+
+  function ActivityTracking(){
+
+    //User activity tracking
+    const IDLE_USER_TIMEOUT = 30000; // 30 seconds
+    let userLastActive = Date.now();
+    let idleStart = null;
+    let idleEnd;
+    let idleTimerHandle = null;
+
+     function sendActivity(data) {
+      if (!initialized || blocked) return;
+      send({
+        type: 'activity',
+        session: getSessionId(),
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        ...data
+      });
+    }
+
+    function activeUser(){
+      if(idleStart !== null){
+        idleEnd = Date.now();
+        const idleDuration = idleEnd - idleStart;
+        totalVisibleTime += idleDuration;
+        
+        sendActivity({
+        activity: 'idle_end',
+        idleEndedAt: new Date(idleEnd).toISOString(),
+        idleDurationMs: idleDuration
+      });
+      idleStart = null;
+    }
+
+    userLastActive = Date.now();
+    clearTimeout(idleTimerHandle);
+    idleTimerHandle = setTimeout(() => {
+      idleStart = Date.now();
+    }, IDLE_USER_TIMEOUT);
+  }
+
+    const activityHandlers = {
+      mousemove: (e) => ({ x: e.clientX, y: e.clientY }),
+      click:     (e) => ({ x: e.clientX, y: e.clientY, button: e.button }),
+      scroll:    ()  => ({ x: window.scrollX, y: window.scrollY }),
+      keydown:   (e) => ({ key: e.key, code: e.code }),
+      keyup:     (e) => ({ key: e.key, code: e.code })
+    };
+
+    let lastMouseSend = 0;
+
+    Object.entries(activityHandlers).forEach(([eventName, extractData]) => {
+      document.addEventListener(eventName, (e) => {
+        onActivity();
+
+        if (eventName === 'mousemove') {
+          const now = Date.now();
+          if (now - lastMouseSend < 200) return;
+          lastMouseSend = now;
+        }
+
+        idleTimerHandle = setTimeout(() => {
+          idleStart = Date.now();
+        }, IDLE_USER_TIMEOUT);
+      });
+    });
+}
 
   // Bootstrap
   processQueue();
