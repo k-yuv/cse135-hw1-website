@@ -16,7 +16,7 @@
    <h2>Enter Username and Password:</h2> 
    <?php
       $msg = '';
-      $users = ['user'=>"test"];
+      $users = ['testuser'=>"Sanrio135Cse"];
 
       if (isset($_POST['login']) && !empty($_POST['username']) 
       && !empty($_POST['password'])) {
