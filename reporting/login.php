@@ -13,7 +13,7 @@
    <title>Login</title>
 </head>
 <body>
-   <h2 style="margin-left:10rem; margin-top:5rem;">Enter Username and Password</h2> 
+   <h2>Enter Username and Password:</h2> 
    <?php
       $msg = '';
       $users = ['user'=>"test"];
@@ -39,7 +39,7 @@
       }
    ?>
 
-   <h4 style="margin-left:10rem; color:red;"><?php echo $msg; ?></h4>
+   <h4 style="color:red;"><?php echo $msg; ?></h4>
    <br/><br/>
    <form action = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
       <div>
@@ -50,9 +50,7 @@
          <label for="password">Password:</label>
          <input type="password" name="password" id="password">
       </div>
-      <section style="margin-left:2rem;">
-      <button type="submit" name="login" >Login</button>
-      </section>
+      <button type="submit" name="login">Login</button>
    </form>
    </div> 
 </body>
