@@ -22,6 +22,8 @@
                $_SESSION['valid'] = true;
                $_SESSION['timeout'] = time();
                $_SESSION['username'] = $_POST['username'];
+               header("Location: graphs.php");
+               exit;
             }
             else {
                $msg = "You have entered the wrong password";
@@ -45,9 +47,7 @@
          <input type="password" name="password" id="password">
       </div>
       <section style="margin-left:2rem;">
-         <a href='graphs.php'>
-            <button type="submit" name="login" >Login</button>
-        </a>
+      <button type="submit" name="login" >Login</button>
       </section>
    </form>
    </div> 
