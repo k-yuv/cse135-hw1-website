@@ -1,6 +1,10 @@
 <?php
    //ob_start();
    session_start();
+   if (isset($_SESSION['valid'])) {
+        header("Location: graphs.php");
+        exit;
+    }
 ?>
 <html lang = "en">
 <head>
