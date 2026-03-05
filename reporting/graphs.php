@@ -53,6 +53,39 @@
                 });
             });
     </script>
+    
+    <div style="max-width: 700px; margin: 40px auto;">
+        <canvas id="performanceChart"></canvas>
+    </div>
+
+    <script>
+        fetch('api.php/performance')
+            .then(res => res.json())
+            .then(data => {
+                new Chart(document.getElementById('performanceChart'), {
+                    type: 'line',
+                    data: {
+                        labels: data.map(row => row.id),
+                        datasets: [{
+                            label: 'Load Time (ms)',
+                            data: data.map(row => row.load_time),
+                            borderColor: '#16a085',
+                            backgroundColor: 'rgba(22, 160, 133, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#16a085'
+                        }]
+                    },
+                    options: {
+                        scales: { y: { beginAtZero: true } },
+                        plugins: {
+                            title: { display: true, text: 'Page Load Time' }
+                        }
+                    }
+                });
+            });
+    </script>
 </body>
 </html>
 
