@@ -95,14 +95,13 @@
         // ZingGrid data
         window.addEventListener('load', () => {
             const zgRef = document.querySelector('zing-grid');
-            const data = [
-                { name: 'Annejulia Milian', origin: 'San Diego, CA, US' },
-                { name: 'Dishita Joshi',    origin: 'San Diego, CA, US' },
-                { name: 'Keyura Valalla',   origin: 'San Diego, CA, US' },
-                { name: 'Suguru Geto',      origin: 'Tokyo, JP'         },
-            ];
-            zgRef.setData(data);
-        });
+            
+            fetch('api.php/performance')
+                .then(res => res.json())
+                .then(data => {
+                    zgRef.setData(data);
+                });
+    });
     </script>
 </body>
 </html>
