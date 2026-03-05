@@ -7,28 +7,38 @@
     }
 ?>
 
-<html lang = "en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Graphs</title>
-   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphs</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer></script>
 </head>
 
 <body>
-     <a href = "logout.php" tite = "Logout">Logout</a>
+    <a href="logout.php" title="Logout">Logout</a>
     <h1>this is the page where the graphs and tables go</h1>
+
+    <!-- Pageviews Bar Chart -->
     <div style="max-width: 700px; margin: 40px auto;">
         <canvas id="pageviewsChart"></canvas>
     </div>
 
+    <!-- Performance Line Chart -->
+    <div style="max-width: 700px; margin: 40px auto;">
+        <canvas id="performanceChart"></canvas>
+    </div>
+
+    <!-- ZingGrid Data Grid -->
+    <zing-grid caption="CSE 135 HW 4 Data Grid"></zing-grid>
+
     <script>
-        // Fetch from your existing API
+        // Pageviews bar chart
         fetch('api.php/pageviews')
             .then(res => res.json())
             .then(data => {
-                // Count pageviews per page
                 const counts = {};
                 data.forEach(row => {
                     const key = row.page || row.url || row.path || Object.values(row)[1];
@@ -53,13 +63,8 @@
                     }
                 });
             });
-    </script>
-    
-    <div style="max-width: 700px; margin: 40px auto;">
-        <canvas id="performanceChart"></canvas>
-    </div>
 
-    <script>
+        // Performance line chart
         fetch('api.php/performance')
             .then(res => res.json())
             .then(data => {
@@ -86,22 +91,17 @@
                     }
                 });
             });
-            window.addEventListener('load', () =>{
-                const zgRef = document.querySelector('zing-grid');
-                const data = [{
-                        name: 'Annejulia Milian',
-                        origin: 'San Diego, CA, US',},
-                {
-                        name: 'Dishita Joshi',
-                        origin: 'San Diego, CA, US',},
-                {
-                        name: 'Keyura Valalla',
-                        origin: 'San Diego, CA, US', },
-                {
-                        name: 'Suguru Geto',
-                        origin: 'Tokyo, JP', }
-                ];
-                zgRef.setData(data);
+
+        // ZingGrid data
+        window.addEventListener('load', () => {
+            const zgRef = document.querySelector('zing-grid');
+            const data = [
+                { name: 'Annejulia Milian', origin: 'San Diego, CA, US' },
+                { name: 'Dishita Joshi',    origin: 'San Diego, CA, US' },
+                { name: 'Keyura Valalla',   origin: 'San Diego, CA, US' },
+                { name: 'Suguru Geto',      origin: 'Tokyo, JP'         },
+            ];
+            zgRef.setData(data);
         });
     </script>
 </body>
