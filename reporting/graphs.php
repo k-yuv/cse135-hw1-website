@@ -15,6 +15,7 @@
 </head>
 
 <body>
+     <a href = "logout.php" tite = "Logout">Logout</a>
     <h1>this is the page where the graphs and tables go</h1>
     <div style="max-width: 700px; margin: 40px auto;">
         <canvas id="pageviewsChart"></canvas>
