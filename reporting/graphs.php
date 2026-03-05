@@ -16,4 +16,39 @@
 
 <body>
     <h1>this is the page where the graphs and tables go</h1>
+    <div style="max-width: 700px; margin: 40px auto;">
+        <canvas id="pageviewsChart"></canvas>
+    </div>
+
+    <script>
+        // Fetch from your existing API
+        fetch('api.php/pageviews')
+            .then(res => res.json())
+            .then(data => {
+                // Count pageviews per page
+                const counts = {};
+                data.forEach(row => {
+                    const key = row.page || row.url || row.path || Object.values(row)[1];
+                    counts[key] = (counts[key] || 0) + 1;
+                });
+
+                new Chart(document.getElementById('pageviewsChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(counts),
+                        datasets: [{
+                            label: 'Pageviews',
+                            data: Object.values(counts),
+                            backgroundColor: '#16a085'
+                        }]
+                    },
+                    options: {
+                        scales: { y: { beginAtZero: true } },
+                        plugins: {
+                            title: { display: true, text: 'Pageviews by Page' }
+                        }
+                    }
+                });
+            });
+    </script>
 </body>
