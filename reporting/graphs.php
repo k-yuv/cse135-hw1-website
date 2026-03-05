@@ -15,6 +15,6 @@
 </head>
 
 <body>
-     <a href = "logout.php" tite = "Logout">Click here to clean Session.</a>
+     <a href = "logout.php" tite = "Logout">Logout</a>
     <h1>this is the page where the graphs and tables go</h1>
 </body>
