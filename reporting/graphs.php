@@ -53,9 +53,6 @@
                     }
                 });
             });
-<<<<<<< HEAD
-        window.addEventListener('load', () =>{
-=======
     </script>
     
     <div style="max-width: 700px; margin: 40px auto;">
@@ -89,43 +86,23 @@
                     }
                 });
             });
-    </script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html>
-        <head>
-                <meta charset="utf-8">
-                <title>ZingGrid: Data Grid</title>
-                <!--Script Reference[1]-->
-                <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer</script>
-        </head>
-        <body>
-                <!--Grid Component Placement [2]-->
-                <zing-grid
-                                caption="CSE 135 HW 4 Data Grid"></zing-grid>
-        </body>
-</html>
-<script>
-    window.addEventListener('load', () =>{
->>>>>>> 6c9a353cc147bcf6861400e2a0bd2ae537554980
-            const zgRef = document.querySelector('zing-grid');
-            const data = [{
-                    name: 'Annejulia Milian',
-                    origin: 'San Diego, CA, US',},
-            {
-                    name: 'Dishita Joshi',
-                    origin: 'San Diego, CA, US',},
-            {
-                    name: 'Keyura Valalla',
-                    origin: 'San Diego, CA, US', },
-            {
-                    name: 'Suguru Geto',
-                    origin: 'Tokyo, JP', }
-            ];
-            zgRef.setData(data);
-    });
+            window.addEventListener('load', () =>{
+                const zgRef = document.querySelector('zing-grid');
+                const data = [{
+                        name: 'Annejulia Milian',
+                        origin: 'San Diego, CA, US',},
+                {
+                        name: 'Dishita Joshi',
+                        origin: 'San Diego, CA, US',},
+                {
+                        name: 'Keyura Valalla',
+                        origin: 'San Diego, CA, US', },
+                {
+                        name: 'Suguru Geto',
+                        origin: 'Tokyo, JP', }
+                ];
+                zgRef.setData(data);
+        });
     </script>
 </body>
 </html>
