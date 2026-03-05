@@ -53,7 +53,63 @@
                     }
                 });
             });
+<<<<<<< HEAD
         window.addEventListener('load', () =>{
+=======
+    </script>
+    
+    <div style="max-width: 700px; margin: 40px auto;">
+        <canvas id="performanceChart"></canvas>
+    </div>
+
+    <script>
+        fetch('api.php/performance')
+            .then(res => res.json())
+            .then(data => {
+                new Chart(document.getElementById('performanceChart'), {
+                    type: 'line',
+                    data: {
+                        labels: data.map(row => row.id),
+                        datasets: [{
+                            label: 'Load Time (ms)',
+                            data: data.map(row => row.load_time),
+                            borderColor: '#16a085',
+                            backgroundColor: 'rgba(22, 160, 133, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#16a085'
+                        }]
+                    },
+                    options: {
+                        scales: { y: { beginAtZero: true } },
+                        plugins: {
+                            title: { display: true, text: 'Page Load Time' }
+                        }
+                    }
+                });
+            });
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html>
+        <head>
+                <meta charset="utf-8">
+                <title>ZingGrid: Data Grid</title>
+                <!--Script Reference[1]-->
+                <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer</script>
+        </head>
+        <body>
+                <!--Grid Component Placement [2]-->
+                <zing-grid
+                                caption="CSE 135 HW 4 Data Grid"></zing-grid>
+        </body>
+</html>
+<script>
+    window.addEventListener('load', () =>{
+>>>>>>> 6c9a353cc147bcf6861400e2a0bd2ae537554980
             const zgRef = document.querySelector('zing-grid');
             const data = [{
                     name: 'Annejulia Milian',
