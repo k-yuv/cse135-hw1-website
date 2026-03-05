@@ -13,6 +13,7 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Graphs</title>
    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer</script>
 </head>
 
 <body>
@@ -52,26 +53,7 @@
                     }
                 });
             });
-    </script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html>
-        <head>
-                <meta charset="utf-8">
-                <title>ZingGrid: Data Grid</title>
-                <!--Script Reference[1]-->
-                <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer</script>
-        </head>
-        <body>
-                <!--Grid Component Placement [2]-->
-                <zing-grid
-                                caption="CSE 135 HW 4 Data Grid"></zing-grid>
-        </body>
-</html>
-<script>
-    window.addEventListener('load', () =>{
+        window.addEventListener('load', () =>{
             const zgRef = document.querySelector('zing-grid');
             const data = [{
                     name: 'Annejulia Milian',
@@ -88,4 +70,6 @@
             ];
             zgRef.setData(data);
     });
-</script>
+    </script>
+</body>
+</html>
