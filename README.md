@@ -1,3 +1,18 @@
+# --- HW 4 ---
+Website Link: reporting.cse135hw1.online
+Username: testuser
+Password: Sanrio135Cse
+
+1. Auth and Nav Specifications:
+For the user authentication, we built a bare-bones login and logout system, with a hardcoded username and password. In future versions of the project, the database will store login information and the login page will fetch from the database. Whenever the user logs in, the page redirects to reporting.cse135hw1.online/graphs.php. If the user attempts to access that page without being logged in, it will automatically redirect to the login page. When the user clicks on logout, it redirects to logout.php which will clear the session and session variables, then redirect to the login page.
+
+2. Data Table Specifications:
+
+3. Datastore Chart Specifications:
+
+# --- HW 3 ---
+Sessioning: To collect data on a specific user, we implemented getSessionId which is a unique number this user has. This ID is stored in storage. The user's activity is tracked like how much time they're idle for, mouse movement, keyboard clicks, etc. All the information in the payload is sent to an endpoint designated for our server. 
+
 # --- HW 2 --- 
 Team members:
 Annejulia Milian
@@ -58,6 +73,3 @@ Before compression the content length of the HTML file was 2641, and after compr
 Naturally, Apache cannot change the server name, so I had to search how to change my server name permanently. I found this link https://www.howtoforge.com/changing-apache-server-name-to-whatever-you-want-with-mod_security-on-debian-6
 
 Following the guide on this link I installed mod security, and I enabled it. It's known as a sever signature, so that is why you see CSE 135 Server.
-
-# Homework 3 
-Sessioning: To collect data on a specific user, we implemented getSessionId which is a unique number this user has. This ID is stored in storage. The user's activity is tracked like how much time they're idle for, mouse movement, keyboard clicks, etc. All the information in the payload is sent to an endpoint designated for our server. 
