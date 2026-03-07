@@ -9,6 +9,7 @@ For the user authentication, we built a bare-bones login and logout system, with
 2. Data Table Specifications:
 
 3. Datastore Chart Specifications:
+We used our existing api.php to expose PostgreSQL tables as JSON endpoints. In graphs.php, we included Chart.js via a script tag and used fetch() to call api.php/pageviews and api.php/performance, passing the returned data directly into Chart.js to render a bar chart of pageviews and a line chart of page load times.
 
 # --- HW 3 ---
 Sessioning: To collect data on a specific user, we implemented getSessionId which is a unique number this user has. This ID is stored in storage. The user's activity is tracked like how much time they're idle for, mouse movement, keyboard clicks, etc. All the information in the payload is sent to an endpoint designated for our server. 
