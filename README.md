@@ -7,6 +7,7 @@ Password: Sanrio135Cse
 For the user authentication, we built a bare-bones login and logout system, with a hardcoded username and password. In future versions of the project, the database will store login information and the login page will fetch from the database. Whenever the user logs in, the page redirects to reporting.cse135hw1.online/graphs.php. If the user attempts to access that page without being logged in, it will automatically redirect to the login page. When the user clicks on logout, it redirects to logout.php which will clear the session and session variables, then redirect to the login page.
 
 2. Data Table Specifications:
+We used ZingChart to generate the data table that displays user information on the reporting dashboard. In graphs.php, I implemented the table using HTML and JavaScript, following the ZingChart documentation and tutorials to apply the proper configuration and styling. The table data is loaded dynamically by using fetch() to call api.php, which returns the user data in JSON format and populates the table on the page
 
 3. Datastore Chart Specifications:
 We used our existing api.php to expose PostgreSQL tables as JSON endpoints. In graphs.php, we included Chart.js via a script tag and used fetch() to call api.php/pageviews and api.php/performance, passing the returned data directly into Chart.js to render a bar chart of pageviews and a line chart of page load times.
