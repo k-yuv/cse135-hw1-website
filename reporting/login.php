@@ -54,7 +54,7 @@ if (isset($_POST['login']) && !empty($_POST['display_name']) && !empty($_POST['p
          } catch (PDOException $e) {
             $msg = "Database connection failed. Please try again later.";
             // Uncomment the line below for debugging only — never in production:
-            // $msg .= " Error: " . $e->getMessage();
+            $msg .= " Error: " . $e->getMessage();
          }
       }
    ?>
