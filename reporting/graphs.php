@@ -15,32 +15,53 @@
     <title>Graphs</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
     <a href="logout.php" title="Logout">Logout</a>
 
-    <!-- Pageviews Bar Chart -->
-    <div style="max-width: 700px; margin: 40px auto;">
-        <canvas id="pageviewsChart"></canvas>
-    </div>
+    <button onclick="exportToPDF()" style="display:block; margin: 20px auto; padding: 10px 20px; cursor: pointer;">
+        Export as PDF
+    </button>
+    <div id="report-Content">
 
-    <!-- Performance Line Chart -->
-    <div style="max-width: 700px; margin: 40px auto;">
-        <canvas id="performanceChart"></canvas>
-    </div>
+        <!-- Pageviews Bar Chart -->
+        <div style="max-width: 700px; margin: 40px auto;">
+            <canvas id="pageviewsChart"></canvas>
+        </div>
 
-    <!-- ZingGrid Data Grid -->
-    <zing-grid caption="CSE 135 HW 4 Data Grid (Performance)"></zing-grid>
+        <!-- Performance Line Chart -->
+        <div style="max-width: 700px; margin: 40px auto;">
+            <canvas id="performanceChart"></canvas>
+        </div>
+
+        <!-- ZingGrid Data Grid -->
+        <zing-grid caption="CSE 135 HW 4 Data Grid"></zing-grid>
 
     <!-- Device Split Doughnut -->
     <div style="max-width: 700px; margin: 40px auto; height: 400px;">
     <canvas id="deviceChart"></canvas>
     </div>
 
-    <!-- Session Duration Bar Chart -->
-    <div style="max-width: 700px; margin: 40px auto; height: 400px;">
-        <canvas id="sessionDurationChart"></canvas>
+         <!-- Session Duration Table -->
+        <div style="max-width: 700px; margin: 40px auto;">
+            <table id="sessionTable" border="1" cellpadding="6" style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th>Session ID</th>
+                        <th>Start time</th>
+                        <th>Duration (s)</th>
+                        <th>Pages</th>
+                        <th>Device</th>
+                    </tr>
+                </thead>
+                <tbody id="sessionTableBody">
+                    <tr><td colspan="5">Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
@@ -111,6 +132,21 @@
                     zgRef.setData(data);
                 });
     });
+
+    async function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('report-Content');
+
+            const canvas = await html2canvas(element, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('report-' + new Date().toISOString().slice(0, 10) + '.pdf');
+        }
     </script>
     
     <script>
