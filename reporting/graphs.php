@@ -25,7 +25,7 @@
     <button onclick="exportToPDF()" style="display:block; margin: 20px auto; padding: 10px 20px; cursor: pointer;">
         Export as PDF
     </button>
-    <div id="reportContent">
+    <div id="report-Content">
 
         <!-- Pageviews Bar Chart -->
         <div style="max-width: 700px; margin: 40px auto;">
@@ -135,7 +135,7 @@
 
     async function exportToPDF() {
             const { jsPDF } = window.jspdf;
-            const element = document.getElementById('report-content');
+            const element = document.getElementById('report-Content');
 
             const canvas = await html2canvas(element, { scale: 2 });
             const imgData = canvas.toDataURL('image/png');
