@@ -35,7 +35,7 @@
         </div>
 
         <!-- Performance Line Chart -->
-        <div style="max-width: 700px; margin: 40px auto;">
+        <div style="max-width: 700px; margin: 40px auto; height: 400px;">
             <canvas id="performanceChart"></canvas>
         </div>
 
@@ -84,32 +84,69 @@
             });
 
         // Performance line chart
-        fetch('api.php/performance')
+fetch('api.php/performance')
+    .then(res => res.json())
+    .then(perfData => {
+        fetch('api.php/sessions')
             .then(res => res.json())
-            .then(data => {
+            .then(sessionData => {
+                // Map session_id -> device
+                const deviceMap = {};
+                sessionData.forEach(row => {
+                    deviceMap[row.session_id] = getDevice(row.user_agent);
+                });
+
+                // Group load times by device
+                const deviceGroups = {};
+                perfData.forEach(row => {
+                    const device = deviceMap[row.session_id] || 'Unknown';
+                    if (!deviceGroups[device]) deviceGroups[device] = [];
+                    deviceGroups[device].push({ id: row.id, load_time: row.load_time });
+                });
+
+                const colors = {
+                    'iOS': '#e67e22',
+                    'Windows': '#2980b9',
+                    'Android': '#16a085',
+                    'Mac': '#8e44ad',
+                    'Unknown': '#95a5a6'
+                };
+
+                const allIds = perfData.map(row => row.id);
+
+                const datasets = Object.entries(deviceGroups).map(([device, rows]) => {
+                    const dataMap = {};
+                    rows.forEach(r => dataMap[r.id] = r.load_time);
+                    return {
+                        label: device,
+                        data: allIds.map(id => dataMap[id] ?? null),
+                        borderColor: colors[device] || '#333',
+                        backgroundColor: 'transparent',
+                        tension: 0.3,
+                        pointRadius: 4,
+                        spanGaps: false
+                    };
+                });
+
                 new Chart(document.getElementById('performanceChart'), {
                     type: 'line',
-                    data: {
-                        labels: data.map(row => row.id),
-                        datasets: [{
-                            label: 'Load Time (ms)',
-                            data: data.map(row => row.load_time),
-                            borderColor: '#16a085',
-                            backgroundColor: 'rgba(22, 160, 133, 0.1)',
-                            fill: true,
-                            tension: 0.3,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#16a085'
-                        }]
-                    },
+                    data: { labels: allIds, datasets },
                     options: {
-                        scales: { y: { beginAtZero: true } },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { title: { display: true, text: 'Entry ID' } },
+                            y: { beginAtZero: true, title: { display: true, text: 'Load Time (ms)' } }
+                        },
                         plugins: {
-                            title: { display: true, text: 'Page Load Time' }
+                            title: { display: true, text: 'Page Load Time by Device' },
+                            legend: { position: 'bottom' }
                         }
                     }
                 });
             });
+    });
+        
 
         // ZingGrid data
         window.addEventListener('load', () => {
