@@ -198,8 +198,13 @@ fetch('api.php/performance')
         // First vs last page
         const pagePairs = {};
         data.forEach(row => {
-            const first = row.first_page || 'Unknown';
-            const last = row.last_page || 'Unknown';
+            const domain = 'https://test.cse135hw1.online';
+            const shorten = url => {
+                const path = (url || '').replace(domain, '') || '/';
+                return path === '/' ? 'root' : path;
+            };
+            const first = shorten(row.first_page);
+            const last = shorten(row.last_page);
             const key = first === last ? 'Bounced (same page)' : `${first} → ${last}`;
             pagePairs[key] = (pagePairs[key] || 0) + 1;
         });
