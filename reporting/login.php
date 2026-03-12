@@ -19,11 +19,9 @@
       $msg = '';
 
       // --- Database configuration ---
-      $db_host = 'localhost';
-      $db_port = '5432';
-      $db_name = 'postgres';
-      $db_user = 'postgres';
-      $db_pass = '';
+      $dsn = "pgsql:host=127.0.0.1;port=5432;dbname=postgres;";
+      $user = "postgres";
+      $password = "Sanrio135Cse";
 
       if (isset($_POST['login']) && !empty($_POST['display_name']) 
       && !empty($_POST['password'])) {
@@ -33,7 +31,7 @@
          // Connect to PostgreSQL
          $dsn = "pgsql:host=$db_host;port=$db_port;dbname=$db_name";
          try {
-            $pdo = new PDO($dsn, $db_user, $db_pass, [
+            $pdo = new PDO($dsn, $user, $password, [
                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             ]);
 
