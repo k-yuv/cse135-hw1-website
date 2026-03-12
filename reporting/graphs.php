@@ -40,7 +40,7 @@
         </div>
     </div>
     <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; margin-top:12px;">
-        <strong style="color:#7a4fa3;">Analyst note:</strong> Traffic is concentrated on the homepage, which accounts for the majority of pageviews. Most users land directly on the root URL rather than navigating to subpages.
+        <strong style="color:#7a4fa3;">Analyst note:</strong> Fig 1: Traffic is concentrated on the homepage, which accounts for the majority of pageviews. Most users land directly on the root URL rather than navigating to subpages.
         </div>
 
     <!-- Row 2: Device Split + First vs Last Page side by side -->
@@ -81,7 +81,7 @@
                     options: {
                         scales: { y: { beginAtZero: true } },
                         plugins: {
-                            title: { display: true, text: 'Pageviews by Page' }
+                            title: { display: true, text: 'Fig 1: Pageviews by Page' }
                         }
                     }
                 });
