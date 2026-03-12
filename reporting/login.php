@@ -15,28 +15,54 @@
    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-   <h2>Enter Username and Password:</h2> 
+   <h2>Enter Display Name and Password:</h2> 
    <?php
       $msg = '';
-      $users = ['testuser'=>"Sanrio135Cse"];
 
-      if (isset($_POST['login']) && !empty($_POST['username']) 
+      // --- Database configuration ---
+      $db_host = 'localhost';
+      $db_port = '5432';
+      $db_name = 'your_database';
+      $db_user = 'your_db_user';
+      $db_pass = 'your_db_password';
+
+      if (isset($_POST['login']) && !empty($_POST['display_name']) 
       && !empty($_POST['password'])) {
-         $user=$_POST['username'];                  
-         if (array_key_exists($user, $users)){
-            if ($users[$_POST['username']]==$_POST['password']){
-               $_SESSION['valid'] = true;
-               $_SESSION['timeout'] = time();
-               $_SESSION['username'] = $_POST['username'];
-               header("Location: graphs.php");
-               exit;
+         $display_name = $_POST['display_name'];
+         $password = $_POST['password'];
+
+         // Connect to PostgreSQL
+         $dsn = "pgsql:host=$db_host;port=$db_port;dbname=$db_name";
+         try {
+            $pdo = new PDO($dsn, $db_user, $db_pass, [
+               PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]);
+
+            // Fetch the user by display_name
+            $stmt = $pdo->prepare("SELECT password_hash, username, role FROM users WHERE display_name = :display_name");
+            $stmt->execute([':display_name' => $display_name]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($row) {
+               // Verify the password against the stored hash
+               if (password_verify($password, $row['password_hash'])) {
+                  $_SESSION['valid'] = true;
+                  $_SESSION['timeout'] = time();
+                  $_SESSION['username'] = $row['username'];
+                  $_SESSION['display_name'] = $display_name;
+                  $_SESSION['role'] = $row['role'];
+                  header("Location: graphs.php");
+                  exit;
+               } else {
+                  $msg = "You have entered the wrong password";
+               }
+            } else {
+               $msg = "You have entered the wrong display name";
             }
-            else {
-               $msg = "You have entered the wrong password";
-            }
-         }
-         else {
-            $msg = "You have entered the wrong username";
+         } catch (PDOException $e) {
+            $msg = "Database connection failed. Please try again later.";
+            // Uncomment the line below for debugging only — never in production:
+            // $msg .= " Error: " . $e->getMessage();
          }
       }
    ?>
@@ -45,8 +71,8 @@
    <br/><br/>
    <form action = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
       <div>
-         <label for="username">Username:</label>
-         <input type="text" name="username" id="name">
+         <label for="display_name">Display Name:</label>
+         <input type="text" name="display_name" id="display_name">
       </div>
       <div>
          <label for="password">Password:</label>
