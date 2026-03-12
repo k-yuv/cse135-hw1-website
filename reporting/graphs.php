@@ -39,18 +39,19 @@
         </div>
     </div>
 
-        <!-- ZingGrid Data Grid -->
-        <zing-grid caption="CSE 135 HW 4 Data Grid"></zing-grid>
-
-    <!-- Device Split Doughnut -->
-    <div style="max-width: 700px; margin: 40px auto; height: 400px;">
-    <canvas id="deviceChart"></canvas>
+    <!-- Row 2: Device Split + First vs Last Page side by side -->
+<div style="display: flex; gap: 20px; margin: 40px auto; max-width: 1400px;">
+    <div style="flex: 1; height: 350px;">
+        <canvas id="deviceChart"></canvas>
     </div>
-
-    <!-- First vs Last Page Chart -->
-    <div style="max-width: 700px; margin: 40px auto; height: 400px;">
+    <div style="flex: 1; height: 350px;">
         <canvas id="firstLastPageChart"></canvas>
     </div>
+</div>
+
+        <!-- ZingGrid Data Grid -->
+        <zing-grid caption="CSE 135 HW 4 Data Grid"></zing-grid>
+  
     </div>
 
     <script>
