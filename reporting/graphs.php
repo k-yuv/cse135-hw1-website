@@ -39,10 +39,13 @@
             <canvas id="performanceChart"></canvas>
         </div>
     </div>
+    
     <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; margin-top:12px;">
-        <strong style="color:#7a4fa3;">Analyst note:</strong> Fig 1: Traffic is concentrated on the homepage, which accounts for the majority of pageviews. Most users land directly on the root URL rather than navigating to subpages.
-        </div>
-
+    <strong style="color:#7a4fa3;">Analyst note:</strong> Fig 1: Traffic is concentrated on the homepage, which accounts for the majority of pageviews. Most users land directly on the root URL rather than navigating to subpages.
+    </div>
+    <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; margin-top:12px;">
+    <strong style="color:#7a4fa3;">Analyst note:</strong> Fig 2: Page load times fluctuate considerably. Spikes above 2,500ms indicate occasional performance bottlenecks that may impact user experience on slower connections.
+    </div>
     <!-- Row 2: Device Split + First vs Last Page side by side -->
 <div style="display: flex; gap: 20px; margin: 40px auto; max-width: 1400px;">
     <div style="flex: 1; height: 350px;">
@@ -112,7 +115,7 @@ fetch('api.php/performance')
                     y: { beginAtZero: true, title: { display: true, text: 'Load Time (ms)' } }
                 },
                 plugins: {
-                    title: { display: true, text: 'Page Load Time' },
+                    title: { display: true, text: 'Fig 2: Page Load Time' },
                     legend: { display: false }
                 }
             }
