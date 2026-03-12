@@ -29,15 +29,15 @@
     </button>
     <div id="report-Content">
 
-        <!-- Pageviews Bar Chart -->
-        <div style="max-width: 700px; margin: 40px auto;">
+        <!-- Row 1: Pageviews + Performance side by side -->
+    <div style="display: flex; gap: 20px; margin: 40px auto; max-width: 1400px;">
+        <div style="flex: 1; height: 350px;">
             <canvas id="pageviewsChart"></canvas>
         </div>
-
-        <!-- Performance Line Chart -->
-        <div style="max-width: 700px; margin: 40px auto; height: 400px;">
+        <div style="flex: 1; height: 350px;">
             <canvas id="performanceChart"></canvas>
         </div>
+    </div>
 
         <!-- ZingGrid Data Grid -->
         <zing-grid caption="CSE 135 HW 4 Data Grid"></zing-grid>
