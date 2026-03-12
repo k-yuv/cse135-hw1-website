@@ -32,7 +32,7 @@ if (isset($_POST['login']) && !empty($_POST['display_name']) && !empty($_POST['p
          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
       ]);
 
-      $stmt = $pdo->prepare("SELECT password_hash, username, role FROM users WHERE display_name = :display_name");
+      $stmt = $pdo->prepare("SELECT password_hash, display_name, role FROM users WHERE display_name = :display_name");
       $stmt->execute([':display_name' => $display_name]);
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -40,7 +40,7 @@ if (isset($_POST['login']) && !empty($_POST['display_name']) && !empty($_POST['p
          if (password_verify($input_password, $row['password_hash'])){
                   $_SESSION['valid'] = true;
                   $_SESSION['timeout'] = time();
-                  $_SESSION['username'] = $row['username'];
+                  $_SESSION['username'] = $row['display_name'];
                   $_SESSION['display_name'] = $display_name;
                   $_SESSION['role'] = $row['role'];
                   header("Location: graphs.php");
