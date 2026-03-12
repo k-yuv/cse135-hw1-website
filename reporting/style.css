@@ -1,0 +1,64 @@
+body {
+    background-color: #fdf0f5;
+    font-family: 'Nunito', sans-serif;
+    padding: 1rem;
+    color: #5a3e4b;
+}
+.navbar {
+    background-color: #f4a7c3 !important;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.08);
+}
+.navbar-brand, .nav-link {
+    color: #fff !important;
+    font-weight: 600;
+}
+.nav-link:hover {
+    color: #fde8f0 !important;
+}
+.card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 0.125rem 0.5rem rgba(244, 167, 195, 0.3);
+    margin-bottom: 1.5rem;
+    background-color: #fff5f8;
+}
+.card-title {
+    color: #c2678a;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+.card-body {
+    padding: 1.25rem;
+}
+.btn-primary {
+    background-color: #f4a7c3;
+    border-color: #f4a7c3;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 2rem;
+    padding: 0.5rem 1.5rem;
+}
+
+.btn-primary:hover {
+    background-color: #e88fb0;
+    border-color: #e88fb0;
+}
+.table {
+    font-size: 0.875rem;
+}
+.table thead th {
+    background-color: #f9d0e3;
+    color: #c2678a;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+}
+.table tbody tr:hover {
+    background-color: #fde8f0;
+}
+.card.login-card {
+    border-top: 0.25rem solid #f4a7c3;
+}
+h4.card-title {
+    color: #c2678a;
+}
