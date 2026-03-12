@@ -89,18 +89,22 @@ body {
 h4.card-title {
     color: #a066b0;
 }
-zing-grid {
-    --zg-head-cell-background: #ead4f5;
-    --zg-head-cell-color: #a066b0;
-    --zg-row-odd-background: #fdf4ff;
-    --zg-row-even-background: #fff;
-    --zg-row-hover-background: #fde8f0;
-    --zg-cell-color: #5a3e4b;
-    --zg-border-color: #e8c8f0;
-    --zg-caption-background: #d4a8e0;
-    --zg-caption-color: #fff;
-    --zg-pager-background: #fdf4ff;
-    --zg-pager-color: #a066b0;
-    --zg-button-background: #d4a8e0;
-    --zg-button-color: #fff;
+/* ZingGrid overrides */
+zing-grid::part(head-cell) {
+    background-color: #ead4f5 !important;
+    color: #a066b0 !important;
+}
+
+zing-grid::part(cell) {
+    color: #5a3e4b !important;
+    border-color: #e8c8f0 !important;
+}
+
+zing-grid::part(row):hover {
+    background-color: #fde8f0 !important;
+}
+
+zing-grid::part(caption) {
+    background-color: #d4a8e0 !important;
+    color: #fff !important;
 }
