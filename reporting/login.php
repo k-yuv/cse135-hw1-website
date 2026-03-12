@@ -21,9 +21,9 @@
       // --- Database configuration ---
       $db_host = 'localhost';
       $db_port = '5432';
-      $db_name = 'your_database';
-      $db_user = 'your_db_user';
-      $db_pass = 'your_db_password';
+      $db_name = 'postgres';
+      $db_user = 'postgres';
+      $db_pass = 'Sanrio134Cse';
 
       if (isset($_POST['login']) && !empty($_POST['display_name']) 
       && !empty($_POST['password'])) {
