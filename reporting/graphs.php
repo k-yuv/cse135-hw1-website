@@ -50,8 +50,7 @@
 </div>
 
         <!-- ZingGrid Data Grid -->
-        <zing-grid caption="CSE 135 HW 4 Data Grid"></zing-grid>
-  
+        <zing-grid caption="CSE 135 Data Grid" theme="pink"></zing-grid>
     </div>
 
     <script>
