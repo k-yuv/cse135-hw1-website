@@ -29,28 +29,43 @@
     </button>
     <div id="report-Content">
 
-        <!-- Pageviews Bar Chart -->
-        <div style="max-width: 700px; margin: 40px auto;">
+        <!-- Row 1: Pageviews + Performance side by side -->
+    <div style="display: flex; gap: 20px; margin: 40px auto; max-width: 1400px;">
+        <div style="flex: 1; height: 350px;">
             <canvas id="pageviewsChart"></canvas>
         </div>
-
-        <!-- Performance Line Chart -->
-        <div style="max-width: 700px; margin: 40px auto; height: 400px;">
+        
+        <div style="flex: 1; height: 350px;">
             <canvas id="performanceChart"></canvas>
         </div>
+    </div>
+    
+    <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 1: Traffic is concentrated on the homepage, which accounts for the majority of pageviews. Most users land directly on the root URL rather than navigating to subpages.
+    </div>
+    <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 2: Page load times fluctuate considerably. Spikes above 2,500ms indicate occasional performance bottlenecks that may impact user experience on slower connections.
+    </div>
+
+    <!-- Row 2: Device Split + First vs Last Page side by side -->
+    <div style="display: flex; gap: 20px; margin: 40px auto; max-width: 1400px;">
+    <div style="flex: 1; height: 350px;">
+        <canvas id="deviceChart"></canvas>
+    </div>
+    <div style="flex: 1; height: 350px;">
+        <canvas id="firstLastPageChart"></canvas>
+    </div>
+
+    </div>
+    <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 3: iOS devices make up the largest share of sessions, suggesting the audience skews mobile. Responsive design and mobile performance should be prioritized.
+    </div>
+    <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 4: Most sessions start and end on the same page, indicating a high bounce rate. Users are not navigating deeper into the site, which may suggest a lack of clear calls-to-action.
+    </div>
 
         <!-- ZingGrid Data Grid -->
-        <zing-grid caption="CSE 135 HW 4 Data Grid"></zing-grid>
-
-    <!-- Device Split Doughnut -->
-    <div style="max-width: 700px; margin: 40px auto; height: 400px;">
-    <canvas id="deviceChart"></canvas>
-    </div>
-
-     <!-- Session Duration Bar Chart -->
-    <div style="max-width: 700px; margin: 40px auto; height: 400px;">
-        <canvas id="sessionDurationChart"></canvas>
-    </div>
+        <zing-grid caption="CSE 135 Data Grid" theme="pink"></zing-grid>
     </div>
 
     <script>
@@ -60,7 +75,8 @@
             .then(data => {
                 const counts = {};
                 data.forEach(row => {
-                    const key = row.page || row.url || row.path || Object.values(row)[1];
+                    const fullKey = row.page || row.url || row.path || Object.values(row)[1];
+                    const key = fullKey.replace('https://test.cse135hw1.online', '') || '/';
                     counts[key] = (counts[key] || 0) + 1;
                 });
 
@@ -77,76 +93,43 @@
                     options: {
                         scales: { y: { beginAtZero: true } },
                         plugins: {
-                            title: { display: true, text: 'Pageviews by Page' }
+                            title: { display: true, text: 'Fig 1: Pageviews by Page' }
                         }
                     }
                 });
             });
 
-        // Performance line chart
+// Performance line chart
 fetch('api.php/performance')
     .then(res => res.json())
-    .then(perfData => {
-        fetch('api.php/sessions')
-            .then(res => res.json())
-            .then(sessionData => {
-                // Map session_id -> device
-                const deviceMap = {};
-                sessionData.forEach(row => {
-                    deviceMap[row.session_id] = getDevice(row.user_agent);
-                });
-
-                // Group load times by device
-                const deviceGroups = {};
-                perfData.forEach(row => {
-                    const device = deviceMap[row.session_id] || 'Unknown';
-                    if (!deviceGroups[device]) deviceGroups[device] = [];
-                    deviceGroups[device].push({ id: row.id, load_time: row.load_time });
-                });
-
-                const colors = {
-                    'iOS': '#e67e22',
-                    'Windows': '#2980b9',
-                    'Android': '#16a085',
-                    'Mac': '#8e44ad',
-                    'Unknown': '#95a5a6'
-                };
-
-                const allIds = perfData.map(row => row.id);
-
-                const datasets = Object.entries(deviceGroups).map(([device, rows]) => {
-                    const dataMap = {};
-                    rows.forEach(r => dataMap[r.id] = r.load_time);
-                    return {
-                        label: device,
-                        data: allIds.map(id => dataMap[id] ?? null),
-                        borderColor: colors[device] || '#333',
-                        backgroundColor: 'transparent',
-                        tension: 0.3,
-                        pointRadius: 4,
-                        spanGaps: false
-                    };
-                });
-
-                new Chart(document.getElementById('performanceChart'), {
-                    type: 'line',
-                    data: { labels: allIds, datasets },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: { title: { display: true, text: 'Entry ID' } },
-                            y: { beginAtZero: true, title: { display: true, text: 'Load Time (ms)' } }
-                        },
-                        plugins: {
-                            title: { display: true, text: 'Page Load Time by Device' },
-                            legend: { position: 'bottom' }
-                        }
-                    }
-                });
-            });
-    });
-        
+    .then(data => {
+        new Chart(document.getElementById('performanceChart'), {
+            type: 'line',
+            data: {
+                labels: data.map(row => row.id),
+                datasets: [{
+                    label: 'Load Time (ms)',
+                    data: data.map(row => row.load_time),
+                    borderColor: '#F4A7C3',
+                    backgroundColor: 'transparent',
+                    tension: 0.3,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: 'Entry ID' } },
+                    y: { beginAtZero: true, title: { display: true, text: 'Load Time (ms)' } }
+                },
+                plugins: {
+                    title: { display: true, text: 'Fig 2: Page Load Time' },
+                    legend: { display: false }
+                }
+            }
+        });
+    });        
 
         // ZingGrid data
         window.addEventListener('load', () => {
@@ -184,59 +167,71 @@ fetch('api.php/performance')
         if (/mac/i.test(ua)) return 'Mac';
         return 'Other';
     }
-
     fetch('api.php/sessions')
-        .then(res => res.json())
-        .then(data => {
-            const deviceCounts = {};
-            data.forEach(row => {
-                const d = getDevice(row.user_agent);
-                deviceCounts[d] = (deviceCounts[d] || 0) + 1;
-            });
+    .then(res => res.json())
+    .then(data => {
+        const deviceCounts = {};
+        data.forEach(row => {
+            const d = getDevice(row.user_agent);
+            deviceCounts[d] = (deviceCounts[d] || 0) + 1;
+        });
 
-            new Chart(document.getElementById('deviceChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(deviceCounts),
-                    datasets: [{
-                        data: Object.values(deviceCounts),
-                        backgroundColor: ['#d4a8e0', '#f4a7c3', '#b08fd4', '#f9d0e3', '#e8c8f0']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: { display: true, text: 'Device Split' },
-                        legend: { position: 'bottom' }
-                    }
+        new Chart(document.getElementById('deviceChart'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(deviceCounts),
+                datasets: [{
+                    data: Object.values(deviceCounts),
+                    backgroundColor: ['#d4a8e0', '#f4a7c3', '#b08fd4', '#f9d0e3', '#e8c8f0']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Fig 3: Device Split' },
+                    legend: { position: 'bottom' }
                 }
-            });
+            }
+        });
 
-            new Chart(document.getElementById('sessionDurationChart'), {
-                type: 'bar',
-                data: {
-                    labels: data.map(row => row.session_id.slice(0, 10) + '…'),
-                    datasets: [{
-                        label: 'Duration (s)',
-                        data: data.map(row => row.duration_seconds ?? 0),
-                        backgroundColor: '#d4a8e0'
-                    }]
+        // First vs last page
+        const pagePairs = {};
+        data.forEach(row => {
+            const first = row.first_page || 'Unknown';
+            const last = row.last_page || 'Unknown';
+            const key = first === last ? 'Bounced (same page)' : `${first} → ${last}`;
+            pagePairs[key] = (pagePairs[key] || 0) + 1;
+        });
+
+        new Chart(document.getElementById('firstLastPageChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(pagePairs),
+                datasets: [{
+                    label: 'Sessions',
+                    data: Object.values(pagePairs),
+                    backgroundColor: Object.keys(pagePairs).map(k =>
+                        k.startsWith('Bounced') ? '#f4a7c3' : '#d4a8e0'
+                    )
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: { beginAtZero: true, title: { display: true, text: 'Sessions' } },
+                    y: { ticks: { font: { size: 10 } } }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { title: { display: true, text: 'Session' } },
-                        y: { beginAtZero: true, title: { display: true, text: 'Duration (s)' } }
-                    },
-                    plugins: {
-                        title: { display: true, text: 'Session Duration' }
-                    }
+                plugins: {
+                    title: { display: true, text: 'Fig 4: First Page vs Last Page' },
+                    legend: { display: false }
                 }
-            });
-        })
-        .catch(err => console.error('sessions fetch error:', err));
+            }
+        });
+    })
+    .catch(err => console.error('sessions fetch error:', err));
 </script>
 </body>
 </html>

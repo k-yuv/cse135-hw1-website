@@ -89,3 +89,22 @@ body {
 h4.card-title {
     color: #a066b0;
 }
+/* ZingGrid overrides */
+zing-grid::part(head-cell) {
+    background-color: #ead4f5 !important;
+    color: #a066b0 !important;
+}
+
+zing-grid::part(cell) {
+    color: #5a3e4b !important;
+    border-color: #e8c8f0 !important;
+}
+
+zing-grid::part(row):hover {
+    background-color: #fde8f0 !important;
+}
+
+zing-grid::part(caption) {
+    background-color: #d4a8e0 !important;
+    color: #fff !important;
+}
