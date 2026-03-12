@@ -75,7 +75,8 @@
             .then(data => {
                 const counts = {};
                 data.forEach(row => {
-                    const key = row.page || row.url || row.path || Object.values(row)[1];
+                    const fullKey = row.page || row.url || row.path || Object.values(row)[1];
+                    const key = fullKey.replace('https://test.cse135hw1.online', '') || '/';
                     counts[key] = (counts[key] || 0) + 1;
                 });
 
