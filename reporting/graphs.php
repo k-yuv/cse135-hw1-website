@@ -71,7 +71,7 @@
                         datasets: [{
                             label: 'Pageviews',
                             data: Object.values(counts),
-                            backgroundColor: '#16a085'
+                            backgroundColor: '#d4a8e0'
                         }]
                     },
                     options: {
@@ -200,7 +200,7 @@ fetch('api.php/performance')
                     labels: Object.keys(deviceCounts),
                     datasets: [{
                         data: Object.values(deviceCounts),
-                        backgroundColor: ['#16a085', '#2980b9', '#e67e22', '#8e44ad', '#95a5a6']
+                        backgroundColor: ['#d4a8e0', '#f4a7c3', '#b08fd4', '#f9d0e3', '#e8c8f0']
                     }]
                 },
                 options: {
@@ -220,7 +220,7 @@ fetch('api.php/performance')
                     datasets: [{
                         label: 'Duration (s)',
                         data: data.map(row => row.duration_seconds ?? 0),
-                        backgroundColor: '#2980b9'
+                        backgroundColor: '#d4a8e0'
                     }]
                 },
                 options: {
