@@ -41,7 +41,7 @@
     </div>
     
     <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
-    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 1: Traffic is concentrated on the homepage, which accounts for the majority of pageviews. Most users land directly on the root URL rather than navigating to subpages.
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 1: Traffic is concentrated on the homepage, which accounts for the majority of pageviews. Most users land directly on the root URL rather than navigating to subpages.Specifically, the homepage received 12 views vs only 1 for /products.html, suggesting users are not discovering the product catalog.
     </div>
     <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
     <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 2: Page load times fluctuate considerably. Spikes above 2,500ms indicate occasional performance bottlenecks that may impact user experience on slower connections.
@@ -61,7 +61,7 @@
     <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 3: iOS devices make up the largest share of sessions, suggesting the audience skews mobile. Responsive design and mobile performance should be prioritized.
     </div>
     <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
-    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 4: Most sessions start and end on the same page, indicating a high bounce rate. Users are not navigating deeper into the site, which may suggest a lack of clear calls-to-action.
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 4: Most sessions start and end on the same page. 8 out of 11 sessions bounced, a 73% bounce rate, indicating the landing page is not driving further engagement.
     </div>
 
         <!-- ZingGrid Data Grid -->
