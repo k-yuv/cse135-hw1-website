@@ -78,7 +78,8 @@ switch ($method) {
                 echo json_encode($result);
             }
         } else {
-            $stmt = $db->query("SELECT * FROM $resource ORDER BY id DESC");
+            $idColumn = $resource === 'sessions' ? 'session_id' : 'id';
+            $stmt = $db->query("SELECT * FROM $resource ORDER BY $idColumn DESC");
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($results);
         }
