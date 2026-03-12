@@ -47,23 +47,10 @@
     <canvas id="deviceChart"></canvas>
     </div>
 
-         <!-- Session Duration Table -->
-        <div style="max-width: 700px; margin: 40px auto;">
-            <table id="sessionTable" border="1" cellpadding="6" style="width:100%; border-collapse:collapse;">
-                <thead>
-                    <tr>
-                        <th>Session ID</th>
-                        <th>Start time</th>
-                        <th>Duration (s)</th>
-                        <th>Pages</th>
-                        <th>Device</th>
-                    </tr>
-                </thead>
-                <tbody id="sessionTableBody">
-                    <tr><td colspan="5">Loading…</td></tr>
-                </tbody>
-            </table>
-        </div>
+     <!-- Session Duration Bar Chart -->
+    <div style="max-width: 700px; margin: 40px auto; height: 400px;">
+        <canvas id="sessionDurationChart"></canvas>
+    </div>
     </div>
 
     <script>
