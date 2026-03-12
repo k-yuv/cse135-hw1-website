@@ -47,9 +47,9 @@
     <canvas id="deviceChart"></canvas>
     </div>
 
-     <!-- Session Duration Bar Chart -->
+    <!-- First vs Last Page Chart -->
     <div style="max-width: 700px; margin: 40px auto; height: 400px;">
-        <canvas id="sessionDurationChart"></canvas>
+        <canvas id="firstLastPageChart"></canvas>
     </div>
     </div>
 
@@ -151,59 +151,71 @@ fetch('api.php/performance')
         if (/mac/i.test(ua)) return 'Mac';
         return 'Other';
     }
-
     fetch('api.php/sessions')
-        .then(res => res.json())
-        .then(data => {
-            const deviceCounts = {};
-            data.forEach(row => {
-                const d = getDevice(row.user_agent);
-                deviceCounts[d] = (deviceCounts[d] || 0) + 1;
-            });
+    .then(res => res.json())
+    .then(data => {
+        const deviceCounts = {};
+        data.forEach(row => {
+            const d = getDevice(row.user_agent);
+            deviceCounts[d] = (deviceCounts[d] || 0) + 1;
+        });
 
-            new Chart(document.getElementById('deviceChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(deviceCounts),
-                    datasets: [{
-                        data: Object.values(deviceCounts),
-                        backgroundColor: ['#d4a8e0', '#f4a7c3', '#b08fd4', '#f9d0e3', '#e8c8f0']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: { display: true, text: 'Device Split' },
-                        legend: { position: 'bottom' }
-                    }
+        new Chart(document.getElementById('deviceChart'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(deviceCounts),
+                datasets: [{
+                    data: Object.values(deviceCounts),
+                    backgroundColor: ['#d4a8e0', '#f4a7c3', '#b08fd4', '#f9d0e3', '#e8c8f0']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Device Split' },
+                    legend: { position: 'bottom' }
                 }
-            });
+            }
+        });
 
-            new Chart(document.getElementById('sessionDurationChart'), {
-                type: 'bar',
-                data: {
-                    labels: data.map(row => row.session_id.slice(0, 10) + '…'),
-                    datasets: [{
-                        label: 'Duration (s)',
-                        data: data.map(row => row.duration_seconds ?? 0),
-                        backgroundColor: '#d4a8e0'
-                    }]
+        // First vs last page
+        const pagePairs = {};
+        data.forEach(row => {
+            const first = row.first_page || 'Unknown';
+            const last = row.last_page || 'Unknown';
+            const key = first === last ? 'Bounced (same page)' : `${first} → ${last}`;
+            pagePairs[key] = (pagePairs[key] || 0) + 1;
+        });
+
+        new Chart(document.getElementById('firstLastPageChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(pagePairs),
+                datasets: [{
+                    label: 'Sessions',
+                    data: Object.values(pagePairs),
+                    backgroundColor: Object.keys(pagePairs).map(k =>
+                        k.startsWith('Bounced') ? '#e67e22' : '#d4a8e0'
+                    )
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: { beginAtZero: true, title: { display: true, text: 'Sessions' } },
+                    y: { ticks: { font: { size: 10 } } }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { title: { display: true, text: 'Session' } },
-                        y: { beginAtZero: true, title: { display: true, text: 'Duration (s)' } }
-                    },
-                    plugins: {
-                        title: { display: true, text: 'Session Duration' }
-                    }
+                plugins: {
+                    title: { display: true, text: 'First Page vs Last Page' },
+                    legend: { display: false }
                 }
-            });
-        })
-        .catch(err => console.error('sessions fetch error:', err));
+            }
+        });
+    })
+    .catch(err => console.error('sessions fetch error:', err));
 </script>
 </body>
 </html>
