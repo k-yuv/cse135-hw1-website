@@ -94,7 +94,7 @@ fetch('api.php/performance')
                 datasets: [{
                     label: 'Load Time (ms)',
                     data: data.map(row => row.load_time),
-                    borderColor: '#e67e22',
+                    borderColor: '#F4A7C3',
                     backgroundColor: 'transparent',
                     tension: 0.3,
                     pointRadius: 4
@@ -196,7 +196,7 @@ fetch('api.php/performance')
                     label: 'Sessions',
                     data: Object.values(pagePairs),
                     backgroundColor: Object.keys(pagePairs).map(k =>
-                        k.startsWith('Bounced') ? '#e67e22' : '#d4a8e0'
+                        k.startsWith('Bounced') ? '#f4a7c3' : '#d4a8e0'
                     )
                 }]
             },
