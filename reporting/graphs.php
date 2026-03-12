@@ -34,26 +34,13 @@
     <zing-grid caption="CSE 135 HW 4 Data Grid (Performance)"></zing-grid>
 
     <!-- Device Split Doughnut -->
-    <div style="max-width: 700px; margin: 40px auto;">
-        <canvas id="deviceChart"></canvas>
+    <div style="max-width: 700px; margin: 40px auto; height: 400px;">
+    <canvas id="deviceChart"></canvas>
     </div>
 
-    <!-- Session Duration Table -->
-    <div style="max-width: 700px; margin: 40px auto;">
-        <table id="sessionTable" border="1" cellpadding="6" style="width:100%; border-collapse:collapse;">
-            <thead>
-                <tr>
-                    <th>Session ID</th>
-                    <th>Start time</th>
-                    <th>Duration (s)</th>
-                    <th>Pages</th>
-                    <th>Device</th>
-                </tr>
-            </thead>
-            <tbody id="sessionTableBody">
-                <tr><td colspan="5">Loading…</td></tr>
-            </tbody>
-        </table>
+    <!-- Session Duration Bar Chart -->
+    <div style="max-width: 700px; margin: 40px auto; height: 400px;">
+        <canvas id="sessionDurationChart"></canvas>
     </div>
 
     <script>
@@ -125,58 +112,69 @@
                 });
     });
     </script>
-
+    
     <script>
-        function getDevice(ua) {
-            if (!ua) return 'Unknown';
-            if (/iphone|ipad|ipod/i.test(ua)) return 'iOS';
-            if (/windows/i.test(ua)) return 'Windows';
-            if (/android/i.test(ua)) return 'Android';
-            if (/mac/i.test(ua)) return 'Mac';
-            return 'Other';
-        }
+    function getDevice(ua) {
+        if (!ua) return 'Unknown';
+        if (/iphone|ipad|ipod/i.test(ua)) return 'iOS';
+        if (/windows/i.test(ua)) return 'Windows';
+        if (/android/i.test(ua)) return 'Android';
+        if (/mac/i.test(ua)) return 'Mac';
+        return 'Other';
+    }
 
-        fetch('api.php/sessions')
-            .then(res => res.json())
-            .then(data => {
-                // Device split doughnut
-                const deviceCounts = {};
-                data.forEach(row => {
-                    const d = getDevice(row.user_agent);
-                    deviceCounts[d] = (deviceCounts[d] || 0) + 1;
-                });
-
-                new Chart(document.getElementById('deviceChart'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.keys(deviceCounts),
-                        datasets: [{
-                            data: Object.values(deviceCounts),
-                            backgroundColor: ['#16a085', '#2980b9', '#e67e22', '#8e44ad', '#95a5a6']
-                        }]
-                    },
-                    options: {
-                        plugins: { title: { display: true, text: 'Device Split' } }
-                    }
-                });
-
-                // Session table
-                const tbody = document.getElementById('sessionTableBody');
-                tbody.innerHTML = '';
-                data.forEach(row => {
-                    const start = row.start_time
-                        ? new Date(row.start_time).toLocaleString()
-                        : '—';
-                    tbody.innerHTML += `
-                        <tr>
-                            <td style="font-family:monospace;font-size:11px;">${row.session_id}</td>
-                            <td>${start}</td>
-                            <td>${row.duration_seconds ?? '—'}</td>
-                            <td>${row.page_count ?? '—'}</td>
-                            <td>${getDevice(row.user_agent)}</td>
-                        </tr>`;
-                });
+    fetch('api.php/sessions')
+        .then(res => res.json())
+        .then(data => {
+            const deviceCounts = {};
+            data.forEach(row => {
+                const d = getDevice(row.user_agent);
+                deviceCounts[d] = (deviceCounts[d] || 0) + 1;
             });
-    </script>
+
+            new Chart(document.getElementById('deviceChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(deviceCounts),
+                    datasets: [{
+                        data: Object.values(deviceCounts),
+                        backgroundColor: ['#16a085', '#2980b9', '#e67e22', '#8e44ad', '#95a5a6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { display: true, text: 'Device Split' },
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('sessionDurationChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.map(row => row.session_id.slice(0, 10) + '…'),
+                    datasets: [{
+                        label: 'Duration (s)',
+                        data: data.map(row => row.duration_seconds ?? 0),
+                        backgroundColor: '#2980b9'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Session' } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Duration (s)' } }
+                    },
+                    plugins: {
+                        title: { display: true, text: 'Session Duration' }
+                    }
+                }
+            });
+        })
+        .catch(err => console.error('sessions fetch error:', err));
+</script>
 </body>
 </html>
