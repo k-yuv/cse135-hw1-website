@@ -41,20 +41,28 @@
     </div>
     
     <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
-    <strong style="color:#7a4fa3;">Analyst note:</strong> Fig 1: Traffic is concentrated on the homepage, which accounts for the majority of pageviews. Most users land directly on the root URL rather than navigating to subpages.
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 1: Traffic is concentrated on the homepage, which accounts for the majority of pageviews. Most users land directly on the root URL rather than navigating to subpages.
     </div>
     <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
-    <strong style="color:#7a4fa3;">Analyst note:</strong> Fig 2: Page load times fluctuate considerably. Spikes above 2,500ms indicate occasional performance bottlenecks that may impact user experience on slower connections.
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 2: Page load times fluctuate considerably. Spikes above 2,500ms indicate occasional performance bottlenecks that may impact user experience on slower connections.
     </div>
+
     <!-- Row 2: Device Split + First vs Last Page side by side -->
-<div style="display: flex; gap: 20px; margin: 40px auto; max-width: 1400px;">
+    <div style="display: flex; gap: 20px; margin: 40px auto; max-width: 1400px;">
     <div style="flex: 1; height: 350px;">
         <canvas id="deviceChart"></canvas>
     </div>
     <div style="flex: 1; height: 350px;">
         <canvas id="firstLastPageChart"></canvas>
     </div>
-</div>
+
+    </div>
+    <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 3: iOS devices make up the largest share of sessions, suggesting the audience skews mobile. Responsive design and mobile performance should be prioritized.
+    </div>
+    <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 4: Most sessions start and end on the same page, indicating a high bounce rate. Users are not navigating deeper into the site, which may suggest a lack of clear calls-to-action.
+    </div>
 
         <!-- ZingGrid Data Grid -->
         <zing-grid caption="CSE 135 Data Grid" theme="pink"></zing-grid>
@@ -180,7 +188,7 @@ fetch('api.php/performance')
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    title: { display: true, text: 'Device Split' },
+                    title: { display: true, text: 'Fig 3: Device Split' },
                     legend: { position: 'bottom' }
                 }
             }
@@ -216,7 +224,7 @@ fetch('api.php/performance')
                     y: { ticks: { font: { size: 10 } } }
                 },
                 plugins: {
-                    title: { display: true, text: 'First Page vs Last Page' },
+                    title: { display: true, text: 'Fig 4: First Page vs Last Page' },
                     legend: { display: false }
                 }
             }
