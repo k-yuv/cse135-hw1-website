@@ -19,30 +19,25 @@
       $msg = '';
 
       // --- Database configuration ---
-      $dsn = "pgsql:host=127.0.0.1;port=5432;dbname=postgres;";
-      $user = "postgres";
-      $password = "Sanrio135Cse";
+$db_dsn  = "pgsql:host=127.0.0.1;port=5432;dbname=postgres;";
+$db_user = "postgres";
+$db_pass = "Sanrio135Cse";
 
-      if (isset($_POST['login']) && !empty($_POST['display_name']) 
-      && !empty($_POST['password'])) {
-         $display_name = $_POST['display_name'];
-         $password = $_POST['password'];
+if (isset($_POST['login']) && !empty($_POST['display_name']) && !empty($_POST['password'])) {
+   $display_name    = $_POST['display_name'];
+   $input_password  = $_POST['password'];
 
-         // Connect to PostgreSQL
-         $dsn = "pgsql:host=$db_host;port=$db_port;dbname=$db_name";
-         try {
-            $pdo = new PDO($dsn, $user, $password, [
-               PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
+   try {
+      $pdo = new PDO($db_dsn, $db_user, $db_pass, [
+         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+      ]);
 
-            // Fetch the user by display_name
-            $stmt = $pdo->prepare("SELECT password_hash, username, role FROM users WHERE display_name = :display_name");
-            $stmt->execute([':display_name' => $display_name]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+      $stmt = $pdo->prepare("SELECT password_hash, username, role FROM users WHERE display_name = :display_name");
+      $stmt->execute([':display_name' => $display_name]);
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($row) {
-               // Verify the password against the stored hash
-               if (password_verify($password, $row['password_hash'])) {
+      if ($row) {
+         if (password_verify($input_password, $row['password_hash'])){
                   $_SESSION['valid'] = true;
                   $_SESSION['timeout'] = time();
                   $_SESSION['username'] = $row['username'];
