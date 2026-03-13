@@ -84,7 +84,7 @@
     <script>
         async function exportToPDF() {
             const { jsPDF } = window.jspdf;
-            const element = document.getElementById('report-Content');
+            const element = document.getElementById('main-content');
 
             const canvas = await html2canvas(element, { scale: 2 });
             const imgData = canvas.toDataURL('image/png');
