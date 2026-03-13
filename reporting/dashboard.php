@@ -98,9 +98,11 @@
 
 <body>
     <h1>Dashboard</h1>
+    <div style="display: flex; justify-content:center">
     <button onclick="exportToPDF()" class="btn btn-3d-lift">
         Export as PDF
     </button>
+    </div>
     <div class="row">
         <div class="card text-center" style="width: 20%">
             <div class="card-body p-5">
