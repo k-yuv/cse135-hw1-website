@@ -153,7 +153,7 @@
         <a href="performance.php">Performance</a>
         <a href="behavior.php">Behavior</a>
         <a href="errors.php">Errors</a>
-        <a href="admin.php">Admin</a>
+        <?php if ($_SESSION['username'] == 'super_admin') echo <a href="admin.php">Admin</a> ?>
     </div>
     <div class="right-navbar">
         <a href="logout.php">Logout</a>
