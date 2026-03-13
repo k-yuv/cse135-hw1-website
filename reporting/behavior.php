@@ -139,14 +139,16 @@
     </div>
     <div class="card mt-4" style="max-width: 1400px; margin: 20px auto;">
     <div class="card-body">
-        <h4 class="card-title">Events</h4>
-        <zing-grid id="eventsGrid" sort pager page-size="15">
+        <h4 class="card-title">Sessions</h4>
+        <zing-grid id="sessionsGrid" sort pager page-size="15">
             <zg-colgroup>
-                <zg-column index="event_name"       header="Event Name"></zg-column>
-                <zg-column index="event_category"   header="Category"></zg-column>
-                <zg-column index="url"              header="URL"></zg-column>
                 <zg-column index="session_id"       header="Session ID"></zg-column>
-                <zg-column index="server_timestamp" header="Timestamp"></zg-column>
+                <zg-column index="first_page"       header="First Page"></zg-column>
+                <zg-column index="last_page"        header="Last Page"></zg-column>
+                <zg-column index="page_count"       header="Pages"></zg-column>
+                <zg-column index="duration_seconds" header="Duration (s)"></zg-column>
+                <zg-column index="referrer"         header="Referrer"></zg-column>
+                <zg-column index="start_time"       header="Start Time"></zg-column>
             </zg-colgroup>
         </zing-grid>
     </div>
@@ -165,6 +167,7 @@
     fetch('api.php/sessions')
     .then(res => res.json())
     .then(data => {
+        document.getElementById('sessionsGrid').setData(data);
         const deviceCounts = {};
         data.forEach(row => {
             const d = getDevice(row.user_agent);
@@ -189,12 +192,6 @@
                 }
             }
         });
-        fetch('api.php/events')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('eventsGrid').setData(data);
-            })
-            .catch(err => console.error('events fetch error:', err));
 
         // First vs last page
         const pagePairs = {};
