@@ -170,7 +170,7 @@
     </div>
 
     <!-- Load Time Over Time -->
-    <div class="card mt-4">
+    <div class="card mt-4 pb-3">
         <div class="card-body" style="height: 350px;">
             <h4 class="card-title">Page Load Time Over Time (Last 30 Days)</h4>
             <canvas id="loadTimeChart"></canvas>
@@ -202,7 +202,7 @@
     </div>
 
     <!-- Full Performance Table -->
-    <div class="card mt-4">
+    <div class="card mt-4 pb-3">
         <div class="card-body">
             <h4 class="card-title">Performance Log</h4>
             <zing-grid id="performanceGrid" sort pager page-size="15">
