@@ -121,12 +121,12 @@
                 height: document.documentElement.scrollHeight,
                 y: 0
             }).then(canvas => {
-                const pdf = new jsPDF('l', 'mm', 'a4');
+                const pdf     = new jsPDF('l', 'mm', 'a4');
                 const pdfWidth  = pdf.internal.pageSize.getWidth();
                 const pdfHeight = pdf.internal.pageSize.getHeight();
 
-                const imgWidth   = pdfWidth;
-                const imgHeight  = (canvas.height * pdfWidth) / canvas.width;
+                const imgWidth  = pdfWidth;
+                const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
                 let heightLeft = imgHeight;
                 let position   = 0;
@@ -135,19 +135,15 @@
                 pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pdfHeight;
 
-                // Extra pages if the screenshot is taller than one page
+                // Extra pages if screenshot is taller than one page
                 while (heightLeft > 0) {
                     position -= pdfHeight;
                     pdf.addPage();
                     pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
                     heightLeft -= pdfHeight;
                 }
-                const pdf = new jsPDF('l', 'mm', 'a4');
-                const pdfWidth  = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
 
-                // Helper to draw a simple table
+                // Helper to draw a table manually
                 function drawTable(title, headers, keys, data, colWidths) {
                     pdf.addPage();
                     pdf.setFontSize(14);
@@ -172,8 +168,8 @@
                     });
                 }
 
-                const nullPages  = <?= json_encode($null_error_pages) ?>;
-                const allErrors  = document.getElementById('allErrorsGrid')?.getData() || [];
+                const nullPages = <?= json_encode($null_error_pages) ?>;
+                const allErrors = document.getElementById('allErrorsGrid')?.getData() || [];
 
                 drawTable(
                     'Pages with No Error Message',
