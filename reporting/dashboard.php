@@ -156,7 +156,7 @@
                 <a href="performance.php">Performance</a>
             <?php endif; ?>
               
-            <?php if ($_SESSION['username'] != 'chiikawa'): ?>
+            <?php if ($_SESSION['username'] != 'VashTheStampede'): ?>
                 <a href="behavior.php">Behavior</a>
             <?php endif; ?>
 
