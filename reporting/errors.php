@@ -203,7 +203,7 @@
     </div>
 
     <!-- Row 1: Top error messages + Errors by page (side by side) -->
-    <div style="display: flex; gap: 20px; margin: 30px auto; max-width: 1400px;">
+    <div style="display: flex; gap: 20px; margin: 30px auto; margin-bottom:0px; max-width: 1400px;">
         <div class="card mt-4 pb-3" style="flex: 1;">
             <div class="card-body" style="height: 380px;">
                 <h4 class="card-title">Top Error Messages</h4>
@@ -219,7 +219,7 @@
     </div>
 
     <!-- Row 2: Error frequency over time + Pie chart (side by side) -->
-    <div style="display: flex; gap: 20px; margin-top: 10px; margin-bottom:0px; max-width: 1400px;">
+    <div style="display: flex; gap: 20px; margin: 10px auto; max-width: 1400px;">
         <div class="card mt-4 pb-3" style="flex: 2;">
             <div class="card-body" style="height: 350px;">
                 <h4 class="card-title">Error Frequency Over Time</h4>
