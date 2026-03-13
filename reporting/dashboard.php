@@ -130,7 +130,7 @@
     </div>
 </nav>
 
-<div class="main-content">
+<div class="main-content" id="main-content">
     <h1>Dashboard</h1>
     <div style="display: flex; justify-content:center">
     <button onclick="exportToPDF()" class="btn btn-3d-lift">
