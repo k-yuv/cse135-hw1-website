@@ -102,7 +102,7 @@
 <body>
 <nav class="navbar">
     <div class="left-navbar">
-        <div style="font-size: 1.5rem; margin-right: 0.5rem;">🌸</div>
+        <div style="display:flex; font-size: 1.5rem; margin-right: 0.5rem;">🌸</div>
         <a href="dashboard.php" class="active">Dashboard</a>
         <?php if ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'owner'): ?>
 
