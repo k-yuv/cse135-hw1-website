@@ -33,6 +33,7 @@ body {
 }
 
 .card {
+    display: flex;
     border: none;
     border-radius: 1rem;
     box-shadow: 0 0.125rem 0.5rem rgba(212, 168, 224, 0.3);
@@ -122,5 +123,4 @@ zing-grid::part(caption) {
 
 .row {
     display: flex;
-    flex-direction: row
 }
