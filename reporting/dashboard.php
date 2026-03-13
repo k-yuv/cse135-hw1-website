@@ -37,28 +37,28 @@
 
 <body>
     <div class="row">
-        <div class="card text-center">
+        <div class="card text-center" style="width: 20%">
             <div class="card-body p-5">
                 <h4 class="card-title">Total Page Views</h4>
                 <p class="text-muted">5</p>
             </div>
         </div>
 
-        <div class="card text-center">
+        <div class="card text-center" style="width: 20%">
             <div class="card-body p-5">
                 <h4 class="card-title">Unique Sessions</h4>
                 <p class="text-muted">5</p>
             </div>
         </div>
 
-        <div class="card text-center">
+        <div class="card text-center" style="width: 20%">
             <div class="card-body p-5">
                 <h4 class="card-title">Average Load Time</h4>
                 <p class="text-muted">5</p>
             </div>
         </div>
 
-        <div class="card text-center">
+        <div class="card text-center" style="width: 20%">
             <div class="card-body p-5">
                 <h4 class="card-title">Error Count</h4>
                 <p class="text-muted">5</p>
