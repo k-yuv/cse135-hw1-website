@@ -33,7 +33,7 @@
                $_SESSION['username']     = $row['display_name'];
                $_SESSION['display_name'] = $display_name;
                $_SESSION['role']         = $row['role'];
-               header("Location: graphs.php");
+               header("Location: dashboard.php");
                exit;
             } else {
                $msg = "Wrong password (｡•́︿•̀｡)";
