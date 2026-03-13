@@ -146,7 +146,7 @@
                         <input type="password" name="password" class="form-control" required>
                     </div>
                     <div class="col-md-1 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Add</button>
+                        <button type="submit" class="btn-primary w-100">Add</button>
                     </div>
                 </div>
             </form>
