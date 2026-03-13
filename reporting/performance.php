@@ -98,6 +98,7 @@
     </script>
 </head>
 
+<body>
 <nav class="navbar">
     <div class="left-navbar">
         <a href="dashboard.php">Dashboard</a>
@@ -111,7 +112,7 @@
     </div>
 </nav>
 
-<body>
+<div class="main-content">
     <h1>Performance</h1>
     <div style="display: flex; justify-content:center">
     <button onclick="exportToPDF()" class="btn btn-3d-lift">
@@ -119,5 +120,6 @@
     </button>
     </div>
     <footer>By Annejulia, Dishita, and Keyura ♡</footer>
+</div>
 </body>
 </html>

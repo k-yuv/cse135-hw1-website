@@ -3,8 +3,14 @@
 body {
     background-color: #fdf0f5;
     font-family: 'Nunito', sans-serif;
-    padding: 1rem;
     color: #5a3e4b;
+    margin: 0;
+    padding: 0;
+}
+
+.main-content {
+    margin: 20px;
+    padding: 1rem;
 }
 
 h1 {
