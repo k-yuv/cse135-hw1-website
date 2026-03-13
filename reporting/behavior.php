@@ -35,66 +35,58 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         function exportToPDF() {
-            const { jsPDF } = window.jspdf;
+    const { jsPDF } = window.jspdf;
 
-            html2canvas(document.body, {
-                ignoreElements: el => el.tagName === 'ZING-GRID'
-            }).then(canvas => {
-                const pdf = new jsPDF('l', 'mm', 'a4');
-                const pdfWidth  = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    html2canvas(document.body, {
+        ignoreElements: el => el.tagName === 'ZING-GRID'
+    }).then(canvas => {
+        const pdf = new jsPDF('l', 'mm', 'a4');
+        const pdfWidth  = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-                // Add the screenshot (everything except the ZingGrid)
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
 
-                // Draw the Top Pages table manually on a new page
-                pdf.addPage();
-                pdf.setFontSize(14);
-                pdf.text('Top Pages', 14, 16);
+        // Manually draw sessions table on a new page
+        pdf.addPage();
+        pdf.setFontSize(14);
+        pdf.text('Sessions', 14, 16);
 
-                const topPagesData = <?= json_encode($top_pages) ?>;
+        const grid = document.getElementById('sessionsGrid');
+        const sessionsData = grid ? grid.getData() : [];
 
-                const tableHead = [['URL', 'Views', 'Unique Sessions']];
-                const tableBody = topPagesData.map(row => [
-                    row.url,
-                    String(row.views),
-                    String(row.unique_sessions)
-                ]);
+        let y = 26;
+        const rowHeight = 8;
+        const startX = 14;
+        const colWidths = [50, 50, 50, 20, 25, 50, 40];
+        const headers = ['Session ID', 'First Page', 'Last Page', 'Pages', 'Duration (s)', 'Referrer', 'Start Time'];
+        const keys    = ['session_id', 'first_page', 'last_page', 'page_count', 'duration_seconds', 'referrer', 'start_time'];
 
-                // jsPDF's built-in autoTable isn't available by default — use a simple manual draw
-                let y = 26;
-                const colWidths = [180, 30, 40];
-                const rowHeight = 8;
-                const startX = 14;
+        // Header row
+        pdf.setFontSize(9);
+        pdf.setFont(undefined, 'bold');
+        headers.forEach((h, i) => {
+            const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
+            pdf.text(h, x, y);
+        });
+        y += rowHeight;
 
-                // Header row
-                pdf.setFontSize(10);
-                pdf.setFont(undefined, 'bold');
-                tableHead[0].forEach((cell, i) => {
-                    const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
-                    pdf.text(cell, x, y);
-                });
-                y += rowHeight;
-
-                // Data rows
-                pdf.setFont(undefined, 'normal');
-                pdf.setFontSize(9);
-                tableBody.forEach(row => {
-                    if (y > 195) { // new page if running out of room
-                        pdf.addPage();
-                        y = 16;
-                    }
-                    row.forEach((cell, i) => {
-                        const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
-                        const truncated = cell.length > 60 ? cell.slice(0, 57) + '...' : cell;
-                        pdf.text(truncated, x, y);
-                    });
-                    y += rowHeight;
-                });
-
-                pdf.save('dashboard.pdf');
+        // Data rows
+        pdf.setFont(undefined, 'normal');
+        pdf.setFontSize(8);
+        (sessionsData || []).forEach(row => {
+            if (y > 195) { pdf.addPage(); y = 16; }
+            keys.forEach((key, i) => {
+                const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
+                const val = String(row[key] ?? '');
+                const truncated = val.length > 20 ? val.slice(0, 17) + '...' : val;
+                pdf.text(truncated, x, y);
             });
-        }
+            y += rowHeight;
+        });
+
+        pdf.save('behavior.pdf');
+    });
+}
     </script>
 </head>
 <body>
