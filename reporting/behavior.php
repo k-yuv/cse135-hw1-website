@@ -137,6 +137,20 @@
     <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
     <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 4: Most sessions start and end on the same page. 8 out of 11 sessions bounced, a 73% bounce rate, indicating the landing page is not driving further engagement.
     </div>
+    <div class="card mt-4" style="max-width: 1400px; margin: 20px auto;">
+    <div class="card-body">
+        <h4 class="card-title">Events</h4>
+        <zing-grid id="eventsGrid" sort pager page-size="15">
+            <zg-colgroup>
+                <zg-column index="event_name"       header="Event Name"></zg-column>
+                <zg-column index="event_category"   header="Category"></zg-column>
+                <zg-column index="url"              header="URL"></zg-column>
+                <zg-column index="session_id"       header="Session ID"></zg-column>
+                <zg-column index="server_timestamp" header="Timestamp"></zg-column>
+            </zg-colgroup>
+        </zing-grid>
+    </div>
+</div>
     <footer class="mt-4">By Annejulia, Dishita, and Keyura ♡</footer>
 </div>
 <script>
@@ -175,6 +189,12 @@
                 }
             }
         });
+        fetch('api.php/events')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('eventsGrid').setData(data);
+            })
+            .catch(err => console.error('events fetch error:', err));
 
         // First vs last page
         const pagePairs = {};
