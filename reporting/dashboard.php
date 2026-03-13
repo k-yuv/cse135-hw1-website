@@ -36,6 +36,7 @@
     </nav>
 
 <body>
+    <h1>Dashboard</h1>
     <div class="row">
         <div class="card text-center" style="width: 20%">
             <div class="card-body p-5">

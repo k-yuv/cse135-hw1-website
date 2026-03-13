@@ -123,5 +123,6 @@ zing-grid::part(caption) {
 
 .row {
     display: flex;
-    justify-content: space-evenly
+    justify-content: space-evenly;
+    margin-top: 1em;
 }
