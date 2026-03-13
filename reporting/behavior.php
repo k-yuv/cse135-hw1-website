@@ -119,12 +119,12 @@
     </button>
     </div>
     <div style="display: flex; gap: 20px; margin: 40px auto; max-width: 1400px;">
-    <div class="card mt-4">
+    <div class="card mt-4" style="flex: 1;">
         <div style="flex: 1; height: 350px;">
             <canvas id="deviceChart"></canvas>
         </div>
     </div>
-    <div class="card mt-4">
+    <div class="card mt-4" style="flex: 1;">
         <div style="flex: 1; height: 350px;">
             <canvas id="firstLastPageChart"></canvas>
         </div>
@@ -137,7 +137,7 @@
     <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
     <strong style="color:#7a4fa3;">Analyst comment:</strong> Fig 4: Most sessions start and end on the same page. 8 out of 11 sessions bounced, a 73% bounce rate, indicating the landing page is not driving further engagement.
     </div>
-    <footer>By Annejulia, Dishita, and Keyura ♡</footer>
+    <footer class="mt-4">By Annejulia, Dishita, and Keyura ♡</footer>
 </div>
 <script>
     function getDevice(ua) {
