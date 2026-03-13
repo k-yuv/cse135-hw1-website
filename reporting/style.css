@@ -120,3 +120,7 @@ zing-grid::part(caption) {
     color: #fff !important;
 }
 
+.row {
+    display: flex;
+    flex-direction: row
+}
