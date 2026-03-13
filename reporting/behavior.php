@@ -96,7 +96,9 @@
         <a href="performance.php">Performance</a>
         <a href="behavior.php">Behavior</a>
         <a href="errors.php">Errors</a>
-        <a href="admin.php">Admin</a>
+        <?php if ($_SESSION['username'] == 'super-admin'): ?>
+            <a href="admin.php">Admin</a> 
+        <?php endif; ?>
     </div>
     <div class="right-navbar">
         <a href="logout.php">Logout</a>
