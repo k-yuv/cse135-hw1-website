@@ -1,7 +1,7 @@
 <?php
     session_start();
 
-    if (!isset($_SESSION['valid']) || $_SESSION['username'] == 'VashTheStampede') {
+    if (!isset($_SESSION['valid']) || $_SESSION['username'] == 'VashTheStampede' || $_SESSION['role'] == 'viewer') {
         header("Location: login.php");
         exit;
     }
