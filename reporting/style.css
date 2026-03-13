@@ -10,6 +10,8 @@ body {
 .navbar {
     background-color: #d4a8e0 !important;
     box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.08);
+    overflow: hidden;
+    width: 100%;
 }
 
 .navbar-brand, .nav-link {
@@ -19,6 +21,15 @@ body {
 
 .nav-link:hover {
     color: #fde8f0 !important;
+}
+
+.navbar a {
+  float: left; /* Aligns links horizontally */
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
 }
 
 .card {
@@ -109,17 +120,3 @@ zing-grid::part(caption) {
     color: #fff !important;
 }
 
-.navbar {
-  background-color: #333;
-  overflow: hidden;
-  width: 100%;
-}
-
-.navbar a {
-  float: left; /* Aligns links horizontally */
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
