@@ -153,8 +153,7 @@
         <a href="performance.php">Performance</a>
         <a href="behavior.php">Behavior</a>
         <a href="errors.php">Errors</a>
-        <?php echo $_SESSION['username'] == 'super_admin'
-              echo <a href="admin.php">Admin</a> ?>
+        <?php echo <a href="admin.php">Admin</a> ?>
     </div>
     <div class="right-navbar">
         <a href="logout.php">Logout</a>
