@@ -103,6 +103,7 @@
 <nav class="navbar">
     <div class="left-navbar">
         <a href="dashboard.php" class="active">Dashboard</a>
+            <div style="font-size: 1.5rem; margin-right: 0.5rem;">🌸</div>
         <?php if ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'owner'): ?>
 
             <?php if ($_SESSION['username'] != 'chiikawa'): ?>
