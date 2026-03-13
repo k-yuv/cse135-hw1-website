@@ -178,7 +178,7 @@
     </div>
 
     <!-- Avg Performance Per Page -->
-    <div class="card mt-4">
+    <div class="card mt-4 pb-3">
         <div class="card-body" style="height: 400px;">
             <h4 class="card-title">Average Load Time Per Page</h4>
             <canvas id="perPageChart"></canvas>
@@ -186,7 +186,7 @@
     </div>
 
     <!-- Top 5 Slowest Pages -->
-    <div class="card mt-4">
+    <div class="card mt-4 pb-3">
         <div class="card-body">
             <h4 class="card-title">Top 5 Slowest Pages</h4>
             <zing-grid id="slowestGrid" sort>
