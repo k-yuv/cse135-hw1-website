@@ -88,8 +88,9 @@
         <a href="errors.php">Errors</a>
         <a href="admin.php" class="active">Admin</a>
     </div>
-    <div class="right-navbar">
+    <div class="right-navbar d-flex align-items-center">
         <a href="logout.php">Logout</a>
+        <p class='d-block text-center py-2 px-3 mb-0'> <?php echo $_SESSION['username'] ?> </p>
     </div>
 </nav>
 
