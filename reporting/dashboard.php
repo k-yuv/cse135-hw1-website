@@ -206,6 +206,6 @@
         });
     </script>
 
-    <footer>hi!!</footer>
+    <footer>By Annejulia, Dishita, and Keyura ♡</footer>
 </body>
 </html>
