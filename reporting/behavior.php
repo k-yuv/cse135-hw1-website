@@ -127,7 +127,7 @@
         Export as PDF
     </button>
     </div>
-    <div style="display: flex; gap: 20px; margin: 40px auto; max-width: 1400px;">
+    <div class="mt-4" style="display: flex; gap: 20px; margin: auto; max-width: 1400px;">
     <div class="card mt-4" style="flex: 1;">
         <div style="flex: 1; height: 350px;">
             <canvas id="deviceChart"></canvas>
