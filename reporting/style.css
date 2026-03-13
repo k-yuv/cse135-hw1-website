@@ -130,5 +130,22 @@ zing-grid::part(caption) {
 .row {
     display: flex;
     justify-content: space-evenly;
-    margin-top: 1em;
+    margin-top: 2em;
+}
+
+.btn-3d-lift {
+    background: #fff;
+    color: #5a3e4b;
+    box-shadow: 0 6px 0 #d4a8e0, 0 8px 10px rgba(0, 0, 0, 0.3);
+    transform: translateY(0);
+}
+
+.btn-3d-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 0 #d4a8e0, 0 14px 20px rgba(0, 0, 0, 0.3);
+}
+
+ .btn-3d-lift:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #d4a8e0, 0 4px 8px rgba(0, 0, 0, 0.3);
 }
