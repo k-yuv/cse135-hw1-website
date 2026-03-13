@@ -105,50 +105,49 @@
 
                 pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
 
-                // Slowest pages table
+                // Page 2: Top 5 Slowest Pages
                 pdf.addPage();
                 pdf.setFontSize(14);
                 pdf.text('Top 5 Slowest Pages', 14, 16);
 
-                const slowest = <?= json_encode($slowest_pages) ?>;
-                const headers = ['URL', 'Avg Load (ms)', 'Avg TTFB (ms)', 'Avg LCP (ms)', 'Samples'];
-                const keys    = ['url', 'avg_load_time', 'avg_ttfb', 'avg_lcp', 'samples'];
-                const colWidths = [120, 35, 35, 35, 25];
+                const slowest     = <?= json_encode($slowest_pages) ?>;
+                const slowHeaders = ['URL', 'Avg Load (ms)', 'Avg TTFB (ms)', 'Avg LCP (ms)', 'Samples'];
+                const slowKeys    = ['url', 'avg_load_time', 'avg_ttfb', 'avg_lcp', 'samples'];
+                const slowWidths  = [120, 35, 35, 35, 25];
 
                 let y = 26;
                 pdf.setFontSize(9);
                 pdf.setFont(undefined, 'bold');
-                headers.forEach((h, i) => {
-                    pdf.text(h, 14 + colWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
+                slowHeaders.forEach((h, i) => {
+                    pdf.text(h, 14 + slowWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
                 });
                 y += 8;
                 pdf.setFont(undefined, 'normal');
                 slowest.forEach(row => {
-                    keys.forEach((k, i) => {
+                    slowKeys.forEach((k, i) => {
                         const val = String(row[k] ?? '');
                         const trunc = val.length > 40 ? val.slice(0, 37) + '...' : val;
-                        pdf.text(trunc, 14 + colWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
+                        pdf.text(trunc, 14 + slowWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
                     });
                     y += 8;
                 });
-                
-                // Full performance log from ZingGrid
+
+                // Page 3+: Full Performance Log
                 pdf.addPage();
                 pdf.setFontSize(14);
                 pdf.text('Performance Log', 14, 16);
 
-                const perfGrid = document.getElementById('performanceGrid');
-                const perfData = perfGrid ? perfGrid.getData() : [];
+                const perfGrid  = document.getElementById('performanceGrid');
+                const perfData  = perfGrid ? perfGrid.getData() : [];
+                const perfHeaders = ['URL', 'Load (ms)', 'TTFB', 'LCP', 'FCP', 'CLS', 'INP', 'DOM Loaded', 'Transfer (b)', 'Resources', 'Timestamp'];
+                const perfKeys    = ['url', 'load_time', 'ttfb', 'lcp', 'fcp', 'cls', 'inp', 'dom_content_loaded', 'transfer_size', 'resource_count', 'server_timestamp'];
+                const perfWidths  = [60, 20, 18, 18, 18, 14, 14, 25, 25, 20, 40];
 
-                const headers   = ['URL', 'Load (ms)', 'TTFB', 'LCP', 'FCP', 'CLS', 'INP', 'DOM Loaded', 'Transfer (b)', 'Resources', 'Timestamp'];
-                const keys      = ['url', 'load_time', 'ttfb', 'lcp', 'fcp', 'cls', 'inp', 'dom_content_loaded', 'transfer_size', 'resource_count', 'server_timestamp'];
-                const colWidths = [60, 20, 18, 18, 18, 14, 14, 25, 25, 20, 40];
-
-                let y = 26;
+                y = 26;
                 pdf.setFontSize(8);
                 pdf.setFont(undefined, 'bold');
-                headers.forEach((h, i) => {
-                    pdf.text(h, 14 + colWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
+                perfHeaders.forEach((h, i) => {
+                    pdf.text(h, 14 + perfWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
                 });
                 y += 7;
 
@@ -156,10 +155,10 @@
                 pdf.setFontSize(7);
                 (perfData || []).forEach(row => {
                     if (y > 200) { pdf.addPage(); y = 16; }
-                    keys.forEach((k, i) => {
+                    perfKeys.forEach((k, i) => {
                         const val = String(row[k] ?? '');
                         const trunc = val.length > 25 ? val.slice(0, 22) + '...' : val;
-                        pdf.text(trunc, 14 + colWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
+                        pdf.text(trunc, 14 + perfWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
                     });
                     y += 7;
                 });
