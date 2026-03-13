@@ -82,11 +82,27 @@
 <body>
 <nav class="navbar">
     <div class="left-navbar">
-        <a href="dashboard.php">Dashboard</a>
-        <a href="performance.php">Performance</a>
-        <a href="behavior.php">Behavior</a>
-        <a href="errors.php">Errors</a>
-        <a href="admin.php" class="active">Admin</a>
+        <a href="dashboard.php" class="active">Dashboard</a>
+        <?php if ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'owner'): ?>
+
+            <?php if ($_SESSION['username'] != 'chiikawa'): ?>
+                <a href="performance.php">Performance</a>
+            <?php endif; ?>
+              
+            <?php if ($_SESSION['username'] != 'VashTheStampede'): ?>
+                <a href="behavior.php">Behavior</a>
+            <?php endif; ?>
+
+            <?php if ($_SESSION['username'] != 'chiikawa'): ?>
+                <a href="errors.php">Errors</a>
+            <?php endif; ?>
+
+        <?php endif; ?>
+
+        <?php if ($_SESSION['username'] == 'super-admin'): ?>
+            <a href="admin.php">Admin</a> 
+        <?php endif; ?>
+
     </div>
     <div class="right-navbar d-flex align-items-center">
         <a href="logout.php">Logout</a>
