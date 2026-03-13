@@ -133,6 +133,23 @@ zing-grid::part(caption) {
     margin-top: 2em;
 }
 
+.btn {
+            position: relative;
+            padding: 12px 24px;
+            border: none;
+            outline: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+        }
+
 .btn-3d-lift {
     background: #fff;
     color: #5a3e4b;
