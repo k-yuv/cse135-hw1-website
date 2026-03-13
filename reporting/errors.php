@@ -115,7 +115,11 @@
             const { jsPDF } = window.jspdf;
 
             html2canvas(document.body, {
-                ignoreElements: el => el.tagName === 'ZING-GRID'
+                ignoreElements: el => el.tagName === 'ZING-GRID',
+                windowWidth: document.documentElement.scrollWidth,
+                windowHeight: document.documentElement.scrollHeight,
+                height: document.documentElement.scrollHeight,
+                y: 0
             }).then(canvas => {
                 const pdf = new jsPDF('l', 'mm', 'a4');
                 const pdfWidth  = pdf.internal.pageSize.getWidth();
