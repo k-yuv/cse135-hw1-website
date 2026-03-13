@@ -37,55 +37,20 @@
         function exportToPDF() {
     const { jsPDF } = window.jspdf;
 
-    html2canvas(document.body, {
-        ignoreElements: el => el.tagName === 'ZING-GRID'
-    }).then(canvas => {
-        const pdf = new jsPDF('l', 'mm', 'a4');
-        const pdfWidth  = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    async function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('main-content');
 
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
+            const canvas = await html2canvas(element, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
 
-        // Manually draw sessions table on a new page
-        pdf.addPage();
-        pdf.setFontSize(14);
-        pdf.text('Sessions', 14, 16);
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        const grid = document.getElementById('sessionsGrid');
-        const sessionsData = grid ? grid.getData() : [];
-
-        let y = 26;
-        const rowHeight = 8;
-        const startX = 14;
-        const colWidths = [50, 50, 50, 20, 25, 50, 40];
-        const headers = ['Session ID', 'First Page', 'Last Page', 'Pages', 'Duration (s)', 'Referrer', 'Start Time'];
-        const keys    = ['session_id', 'first_page', 'last_page', 'page_count', 'duration_seconds', 'referrer', 'start_time'];
-
-        // Header row
-        pdf.setFontSize(9);
-        pdf.setFont(undefined, 'bold');
-        headers.forEach((h, i) => {
-            const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
-            pdf.text(h, x, y);
-        });
-        y += rowHeight;
-
-        // Data rows
-        pdf.setFont(undefined, 'normal');
-        pdf.setFontSize(8);
-        (sessionsData || []).forEach(row => {
-            if (y > 195) { pdf.addPage(); y = 16; }
-            keys.forEach((key, i) => {
-                const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
-                const val = String(row[key] ?? '');
-                const truncated = val.length > 20 ? val.slice(0, 17) + '...' : val;
-                pdf.text(truncated, x, y);
-            });
-            y += rowHeight;
-        });
-
-        pdf.save('behavior.pdf');
-    });
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('report-' + new Date().toISOString().slice(0, 10) + '.pdf');
+        }
 }
     </script>
 </head>
@@ -120,7 +85,7 @@
     </div>
 </nav>
 
-<div class="main-content">
+<div class="main-content" id="main-content">
     <h1>Behavior</h1>
     <div style="display: flex; justify-content:center">
     <button onclick="exportToPDF()" class="btn btn-3d-lift">

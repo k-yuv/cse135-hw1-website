@@ -93,78 +93,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        function exportToPDF() {
+        async function exportToPDF() {
             const { jsPDF } = window.jspdf;
+            const element = document.getElementById('main-content');
 
-            html2canvas(document.body, {
-                ignoreElements: el => el.tagName === 'ZING-GRID'
-            }).then(canvas => {
-                const pdf = new jsPDF('l', 'mm', 'a4');
-                const pdfWidth  = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            const canvas = await html2canvas(element, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
 
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-                // Page 2: Top 5 Slowest Pages
-                pdf.addPage();
-                pdf.setFontSize(14);
-                pdf.text('Top 5 Slowest Pages', 14, 16);
-
-                const slowest     = <?= json_encode($slowest_pages) ?>;
-                const slowHeaders = ['URL', 'Avg Load (ms)', 'Avg TTFB (ms)', 'Avg LCP (ms)', 'Samples'];
-                const slowKeys    = ['url', 'avg_load_time', 'avg_ttfb', 'avg_lcp', 'samples'];
-                const slowWidths  = [120, 35, 35, 35, 25];
-
-                let y = 26;
-                pdf.setFontSize(9);
-                pdf.setFont(undefined, 'bold');
-                slowHeaders.forEach((h, i) => {
-                    pdf.text(h, 14 + slowWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
-                });
-                y += 8;
-                pdf.setFont(undefined, 'normal');
-                slowest.forEach(row => {
-                    slowKeys.forEach((k, i) => {
-                        const val = String(row[k] ?? '');
-                        const trunc = val.length > 40 ? val.slice(0, 37) + '...' : val;
-                        pdf.text(trunc, 14 + slowWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
-                    });
-                    y += 8;
-                });
-
-                // Page 3+: Full Performance Log
-                pdf.addPage();
-                pdf.setFontSize(14);
-                pdf.text('Performance Log', 14, 16);
-
-                const perfGrid  = document.getElementById('performanceGrid');
-                const perfData  = perfGrid ? perfGrid.getData() : [];
-                const perfHeaders = ['URL', 'Load (ms)', 'TTFB', 'LCP', 'FCP', 'CLS', 'INP', 'DOM Loaded', 'Transfer (b)', 'Resources', 'Timestamp'];
-                const perfKeys    = ['url', 'load_time', 'ttfb', 'lcp', 'fcp', 'cls', 'inp', 'dom_content_loaded', 'transfer_size', 'resource_count', 'server_timestamp'];
-                const perfWidths  = [60, 20, 18, 18, 18, 14, 14, 25, 25, 20, 40];
-
-                y = 26;
-                pdf.setFontSize(8);
-                pdf.setFont(undefined, 'bold');
-                perfHeaders.forEach((h, i) => {
-                    pdf.text(h, 14 + perfWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
-                });
-                y += 7;
-
-                pdf.setFont(undefined, 'normal');
-                pdf.setFontSize(7);
-                (perfData || []).forEach(row => {
-                    if (y > 200) { pdf.addPage(); y = 16; }
-                    perfKeys.forEach((k, i) => {
-                        const val = String(row[k] ?? '');
-                        const trunc = val.length > 25 ? val.slice(0, 22) + '...' : val;
-                        pdf.text(trunc, 14 + perfWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
-                    });
-                    y += 7;
-                });
-
-                pdf.save('performance.pdf');
-            });
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('report-' + new Date().toISOString().slice(0, 10) + '.pdf');
         }
     </script>
 </head>
@@ -194,7 +135,7 @@
     </div>
 </nav>
 
-<div class="main-content">
+<div class="main-content" id="main-content">
     <h1>Performance</h1>
     <div style="display: flex; justify-content: center;">
         <button onclick="exportToPDF()" class="btn btn-3d-lift">Export as PDF</button>

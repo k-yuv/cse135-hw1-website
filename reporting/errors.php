@@ -111,84 +111,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        function exportToPDF() {
+        async function exportToPDF() {
             const { jsPDF } = window.jspdf;
+            const element = document.getElementById('main-content');
 
-            html2canvas(document.body, {
-                ignoreElements: el => el.tagName === 'ZING-GRID',
-                windowWidth: document.documentElement.scrollWidth,
-                windowHeight: document.documentElement.scrollHeight,
-                height: document.documentElement.scrollHeight,
-                y: 0
-            }).then(canvas => {
-                const pdf     = new jsPDF('l', 'mm', 'a4');
-                const pdfWidth  = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
+            const canvas = await html2canvas(element, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
 
-                const imgWidth  = pdfWidth;
-                const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-                let heightLeft = imgHeight;
-                let position   = 0;
-
-                // First page
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pdfHeight;
-
-                // Extra pages if screenshot is taller than one page
-                while (heightLeft > 0) {
-                    position -= pdfHeight;
-                    pdf.addPage();
-                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pdfHeight;
-                }
-
-                // Helper to draw a table manually
-                function drawTable(title, headers, keys, data, colWidths) {
-                    pdf.addPage();
-                    pdf.setFontSize(14);
-                    pdf.text(title, 14, 16);
-                    let y = 26;
-                    pdf.setFontSize(9);
-                    pdf.setFont(undefined, 'bold');
-                    headers.forEach((h, i) => {
-                        pdf.text(h, 14 + colWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
-                    });
-                    y += 8;
-                    pdf.setFont(undefined, 'normal');
-                    pdf.setFontSize(8);
-                    data.forEach(row => {
-                        if (y > 195) { pdf.addPage(); y = 16; }
-                        keys.forEach((k, i) => {
-                            const val = String(row[k] ?? '');
-                            const trunc = val.length > 45 ? val.slice(0, 42) + '...' : val;
-                            pdf.text(trunc, 14 + colWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
-                        });
-                        y += 8;
-                    });
-                }
-
-                const nullPages = <?= json_encode($null_error_pages) ?>;
-                const allErrors = document.getElementById('allErrorsGrid')?.getData() || [];
-
-                drawTable(
-                    'Pages with No Error Message',
-                    ['URL', 'Count', 'Last Seen'],
-                    ['url', 'count', 'last_seen'],
-                    nullPages,
-                    [160, 30, 60]
-                );
-
-                drawTable(
-                    'All Errors',
-                    ['ID', 'Error Message', 'URL', 'Line', 'Timestamp'],
-                    ['id', 'error_message', 'url', 'error_line', 'server_timestamp'],
-                    allErrors,
-                    [15, 90, 70, 15, 55]
-                );
-
-                pdf.save('errors.pdf');
-            });
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('report-' + new Date().toISOString().slice(0, 10) + '.pdf');
         }
     </script>
 </head>
@@ -217,7 +152,7 @@
     </div>
 </nav>
 
-<div class="main-content">
+<div class="main-content" id="main-content">
     <h1>Errors</h1>
     <div style="display: flex; justify-content: center;">
         <button onclick="exportToPDF()" class="btn btn-3d-lift">Export as PDF</button>
