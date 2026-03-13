@@ -220,7 +220,7 @@
 
     <!-- Row 2: Error frequency over time + Pie chart (side by side) -->
     <div style="display: flex; gap: 20px; margin: 10px auto; max-width: 1400px;">
-        <div class="card mt-4 pb-3" style="flex: 2;">
+        <div class="card mt-0 pb-3" style="flex: 2;">
             <div class="card-body" style="height: 350px;">
                 <h4 class="card-title">Error Frequency Over Time</h4>
                 <canvas id="errorTimeChart"></canvas>
