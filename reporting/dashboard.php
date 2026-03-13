@@ -37,40 +37,32 @@
 
 <body>
     <div class="row">
-        <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
         <div class="card text-center">
             <div class="card-body p-5">
                 <h4 class="card-title">Total Page Views</h4>
                 <p class="text-muted">5</p>
             </div>
         </div>
-        </div>
 
-        <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
         <div class="card text-center">
             <div class="card-body p-5">
                 <h4 class="card-title">Unique Sessions</h4>
                 <p class="text-muted">5</p>
             </div>
         </div>
-        </div>
 
-        <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
         <div class="card text-center">
             <div class="card-body p-5">
                 <h4 class="card-title">Average Load Time</h4>
                 <p class="text-muted">5</p>
             </div>
         </div>
-        </div>
 
-        <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
         <div class="card text-center">
             <div class="card-body p-5">
                 <h4 class="card-title">Error Count</h4>
                 <p class="text-muted">5</p>
             </div>
-        </div>
         </div>
     </div>
 
