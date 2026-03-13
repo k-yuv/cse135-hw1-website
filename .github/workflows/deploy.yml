@@ -40,6 +40,11 @@ jobs:
             cleancss -o "$f" "$f"
           done
 
+          # Minify PHP
+          find reporting www collector -name "*.php" | while read f; do
+            php-minify "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+          done
+
       - name: Deploy via rsync
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
