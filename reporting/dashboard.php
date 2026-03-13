@@ -15,6 +15,7 @@
     $avg_load_time       = 0;
     $error_count         = 0;
     $pageviews_over_time = [];
+    $top_pages           = [];
 
     try {
         $pdo = new PDO($db_dsn, $db_user, $db_pass, [
@@ -37,6 +38,19 @@
         // Error count
         $stmt = $pdo->query("SELECT COUNT(*) FROM errors");
         $error_count = $stmt->fetchColumn();
+
+        // Top pages by view count
+        $stmt = $pdo->query("
+            SELECT
+                url,
+                COUNT(*) AS views,
+                COUNT(DISTINCT session_id) AS unique_sessions
+            FROM pageviews
+            GROUP BY url
+            ORDER BY views DESC
+            LIMIT 20
+        ");
+        $top_pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Pageviews over time — grouped by day for the last 30 days
         $stmt = $pdo->query("
@@ -166,7 +180,31 @@
         });
     </script>
 
-    <p>table of top pages</p>
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4 class="card-title">Top Pages</h4>
+            <zing-grid
+                id="topPagesGrid"
+                sort
+                pager
+                page-size="10"
+                caption="Top Pages by Views">
+                <zg-colgroup>
+                    <zg-column index="url"             header="URL"></zg-column>
+                    <zg-column index="views"           header="Views"           type="number"></zg-column>
+                    <zg-column index="unique_sessions" header="Unique Sessions" type="number"></zg-column>
+                </zg-colgroup>
+            </zing-grid>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const topPagesData = <?= json_encode($top_pages) ?>;
+            const grid = document.getElementById('topPagesGrid');
+            grid.setData(topPagesData);
+        });
+    </script>
 
     <footer>hi!!</footer>
 </body>
