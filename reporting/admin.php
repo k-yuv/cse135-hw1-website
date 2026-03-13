@@ -10,15 +10,60 @@
     $db_user = "postgres";
     $db_pass = "Sanrio135Cse";
 
+    $message      = '';
+    $message_type = '';
+
     try {
         $pdo = new PDO($db_dsn, $db_user, $db_pass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ]);
 
+        // Handle remove user
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove') {
+            $id = (int) $_POST['user_id'];
+            $stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+            $message      = 'User removed successfully.';
+            $message_type = 'success';
+        }
+
+        // Handle add user
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add') {
+            $email        = trim($_POST['email']);
+            $display_name = trim($_POST['display_name']);
+            $role         = $_POST['role'];
+            $password     = $_POST['password'];
+
+            $allowed_roles = ['viewer', 'admin']; // adjust to match your user_role enum
+            if (!in_array($role, $allowed_roles)) {
+                $role = 'viewer';
+            }
+
+            $password_hash = password_hash($password, PASSWORD_BCRYPT);
+
+            $stmt = $pdo->prepare("
+                INSERT INTO users (email, display_name, role, password_hash)
+                VALUES (:email, :display_name, :role, :password_hash)
+            ");
+            $stmt->execute([
+                ':email'         => $email,
+                ':display_name'  => $display_name,
+                ':role'          => $role,
+                ':password_hash' => $password_hash,
+            ]);
+            $message      = 'User added successfully.';
+            $message_type = 'success';
+        }
+
+        // Fetch all users
+        $stmt  = $pdo->query("SELECT id, email, display_name, role, last_login FROM users ORDER BY id ASC");
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     } catch (PDOException $e) {
-        // Silently fall back to defaults; log in production
         error_log("DB error: " . $e->getMessage());
+        $message      = 'A database error occurred.';
+        $message_type = 'danger';
+        $users        = [];
     }
 ?>
 <!DOCTYPE html>
@@ -33,69 +78,6 @@
     <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script>
-        function exportToPDF() {
-            const { jsPDF } = window.jspdf;
-
-            html2canvas(document.body, {
-                ignoreElements: el => el.tagName === 'ZING-GRID'
-            }).then(canvas => {
-                const pdf = new jsPDF('l', 'mm', 'a4');
-                const pdfWidth  = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-                // Add the screenshot (everything except the ZingGrid)
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-                // Draw the Top Pages table manually on a new page
-                pdf.addPage();
-                pdf.setFontSize(14);
-                pdf.text('Top Pages', 14, 16);
-
-                const topPagesData = <?= json_encode($top_pages) ?>;
-
-                const tableHead = [['URL', 'Views', 'Unique Sessions']];
-                const tableBody = topPagesData.map(row => [
-                    row.url,
-                    String(row.views),
-                    String(row.unique_sessions)
-                ]);
-
-                // jsPDF's built-in autoTable isn't available by default — use a simple manual draw
-                let y = 26;
-                const colWidths = [180, 30, 40];
-                const rowHeight = 8;
-                const startX = 14;
-
-                // Header row
-                pdf.setFontSize(10);
-                pdf.setFont(undefined, 'bold');
-                tableHead[0].forEach((cell, i) => {
-                    const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
-                    pdf.text(cell, x, y);
-                });
-                y += rowHeight;
-
-                // Data rows
-                pdf.setFont(undefined, 'normal');
-                pdf.setFontSize(9);
-                tableBody.forEach(row => {
-                    if (y > 195) { // new page if running out of room
-                        pdf.addPage();
-                        y = 16;
-                    }
-                    row.forEach((cell, i) => {
-                        const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
-                        const truncated = cell.length > 60 ? cell.slice(0, 57) + '...' : cell;
-                        pdf.text(truncated, x, y);
-                    });
-                    y += rowHeight;
-                });
-
-                pdf.save('dashboard.pdf');
-            });
-        }
-    </script>
 </head>
 <body>
 <nav class="navbar">
@@ -104,7 +86,7 @@
         <a href="performance.php">Performance</a>
         <a href="behavior.php">Behavior</a>
         <a href="errors.php">Errors</a>
-        <a href="admin.php">Admin</a>
+        <a href="admin.php" class="active">Admin</a>
     </div>
     <div class="right-navbar">
         <a href="logout.php">Logout</a>
@@ -113,12 +95,98 @@
 
 <div class="main-content">
     <h1>Admin</h1>
-    <div style="display: flex; justify-content:center">
-    <button onclick="exportToPDF()" class="btn btn-3d-lift">
-        Export as PDF
-    </button>
+
+    <?php if ($message): ?>
+        <div class="alert alert-<?= htmlspecialchars($message_type) ?> alert-dismissible fade show" role="alert">
+            <?= htmlspecialchars($message) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <!-- Users Table -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4 class="card-title">Users</h4>
+            <zing-grid id="usersGrid" sort pager page-size="10">
+                <zg-colgroup>
+                    <zg-column index="email"        header="Email"></zg-column>
+                    <zg-column index="display_name" header="Display Name"></zg-column>
+                    <zg-column index="role"         header="Role"></zg-column>
+                    <zg-column index="last_login"   header="Last Login"></zg-column>
+                    <zg-column index="id"           header="Actions" renderer="renderRemoveBtn"></zg-column>
+                </zg-colgroup>
+            </zing-grid>
+        </div>
     </div>
+
+    <!-- Add User Form -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4 class="card-title">Add User</h4>
+            <form method="POST" action="admin.php">
+                <input type="hidden" name="action" value="add">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Display Name</label>
+                        <input type="text" name="display_name" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Role</label>
+                        <select name="role" class="form-select">
+                            <option value="viewer">Viewer</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden remove form, submitted via JS -->
+    <form id="removeForm" method="POST" action="admin.php" style="display:none;">
+        <input type="hidden" name="action" value="remove">
+        <input type="hidden" name="user_id" id="removeUserId">
+    </form>
+
     <footer>By Annejulia, Dishita, and Keyura ♡</footer>
 </div>
+
+<script>
+    // ZingGrid renderer for the Remove button column
+    function renderRemoveBtn(id) {
+        return `<button
+                    class="btn btn-danger btn-sm"
+                    onclick="removeUser(${id})">
+                    Remove
+                </button>`;
+    }
+
+    function removeUser(id) {
+        if (!confirm('Are you sure you want to remove this user?')) return;
+        document.getElementById('removeUserId').value = id;
+        document.getElementById('removeForm').submit();
+    }
+
+    // Feed PHP data into ZingGrid after it registers
+    const usersData = <?= json_encode($users) ?>;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const grid = document.getElementById('usersGrid');
+        grid.setData(usersData);
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
