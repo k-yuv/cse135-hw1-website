@@ -21,7 +21,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
-<body>
+
     <nav class="navbar">
         <div classname="left-navbar">
             <a href="dashboard.php" class="active">Dashboard</a>
@@ -34,7 +34,8 @@
             <a href="logout.php">Logout</a>
         </div>
     </nav>
-
+    
+<body>
     <div classname="row">
         <card>
             <h2>Total Page Views</h2>
