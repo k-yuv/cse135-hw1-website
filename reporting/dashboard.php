@@ -82,20 +82,68 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-    function exportToPDF() {
-        html2canvas(document.body).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
+        function exportToPDF() {
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('l', 'mm', 'a4'); // landscape
 
-            const pdfWidth  = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            html2canvas(document.body, {
+                ignoreElements: el => el.tagName === 'ZING-GRID'
+            }).then(canvas => {
+                const pdf = new jsPDF('l', 'mm', 'a4');
+                const pdfWidth  = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save('dashboard.pdf');
-        });
-    }
-</script>
+                // Add the screenshot (everything except the ZingGrid)
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+                // Draw the Top Pages table manually on a new page
+                pdf.addPage();
+                pdf.setFontSize(14);
+                pdf.text('Top Pages', 14, 16);
+
+                const topPagesData = <?= json_encode($top_pages) ?>;
+
+                const tableHead = [['URL', 'Views', 'Unique Sessions']];
+                const tableBody = topPagesData.map(row => [
+                    row.url,
+                    String(row.views),
+                    String(row.unique_sessions)
+                ]);
+
+                // jsPDF's built-in autoTable isn't available by default — use a simple manual draw
+                let y = 26;
+                const colWidths = [180, 30, 40];
+                const rowHeight = 8;
+                const startX = 14;
+
+                // Header row
+                pdf.setFontSize(10);
+                pdf.setFont(undefined, 'bold');
+                tableHead[0].forEach((cell, i) => {
+                    const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
+                    pdf.text(cell, x, y);
+                });
+                y += rowHeight;
+
+                // Data rows
+                pdf.setFont(undefined, 'normal');
+                pdf.setFontSize(9);
+                tableBody.forEach(row => {
+                    if (y > 195) { // new page if running out of room
+                        pdf.addPage();
+                        y = 16;
+                    }
+                    row.forEach((cell, i) => {
+                        const x = startX + colWidths.slice(0, i).reduce((a, b) => a + b, 0);
+                        const truncated = cell.length > 60 ? cell.slice(0, 57) + '...' : cell;
+                        pdf.text(truncated, x, y);
+                    });
+                    y += rowHeight;
+                });
+
+                pdf.save('dashboard.pdf');
+            });
+        }
+    </script>
 </head>
 
 <nav class="navbar">
