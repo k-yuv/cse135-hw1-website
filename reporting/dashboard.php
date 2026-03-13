@@ -221,13 +221,12 @@
 
     <div class="card mt-4">
         <div class="card-body">
-            <h4 class="card-title">Top Pages</h4>
+            <h4 class="card-title">Top Pages by Views</h4>
             <zing-grid
                 id="topPagesGrid"
                 sort
                 pager
-                page-size="10"
-                caption="Top Pages by Views">
+                page-size="10">
                 <zg-colgroup>
                     <zg-column index="url"             header="URL"></zg-column>
                     <zg-column index="views"           header="Views"           type="number"></zg-column>
