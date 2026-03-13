@@ -161,7 +161,7 @@
     </div>
     <div class="right-navbar d-flex align-items-center">
         <a href="logout.php">Logout</a>
-        <p class='me-3'> <?php echo $_SESSION['username'] ?> </p>
+        <p class='me-3 d-block text-center'> <?php echo $_SESSION['username'] ?> </p>
     </div>
 </nav>
 
