@@ -159,9 +159,9 @@
             <a href="admin.php">Admin</a> 
         <?php endif; ?>
     </div>
-    <div class="right-navbar d-flex align-middle ps-3">
+    <div class="right-navbar d-flex">
         <a href="logout.php">Logout</a>
-        <p> <?php echo $_SESSION['username'] ?> </p>
+        <p class='align-middle ms-3'> <?php echo $_SESSION['username'] ?> </p>
     </div>
 </nav>
 
