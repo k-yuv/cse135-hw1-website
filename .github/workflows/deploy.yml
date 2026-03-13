@@ -43,6 +43,12 @@ jobs:
           # Minify PHP
           find reporting www collector -name "*.php" | while read f; do
             sed '/^[[:space:]]*\/\//d; /^[[:space:]]*#/d; /^[[:space:]]*$/d' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+            html-minifier-terser \
+              --collapse-whitespace \
+              --remove-comments \
+              --minify-css true \
+              --minify-js true \
+              "$f" -o "$f"
           done
 
       - name: Deploy via rsync
