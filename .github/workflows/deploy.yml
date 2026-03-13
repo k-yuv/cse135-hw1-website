@@ -16,7 +16,7 @@ jobs:
           node-version: '20'
 
       - name: Install minifiers
-        run: npm install -g html-minifier-terser terser clean-css-cli php-minifier
+        run: npm install -g html-minifier-terser terser clean-css-cli
 
       - name: Minify assets
         run: |
@@ -42,7 +42,7 @@ jobs:
 
           # Minify PHP
           find reporting www collector -name "*.php" | while read f; do
-            php-minify "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+            sed '/^[[:space:]]*\/\//d; /^[[:space:]]*#/d; /^[[:space:]]*$/d' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
           done
 
       - name: Deploy via rsync
