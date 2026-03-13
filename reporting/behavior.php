@@ -117,7 +117,7 @@
     <button onclick="exportToPDF()" class="btn btn-3d-lift">
         Export as PDF
     </button>
-
+    </div>
     <footer>By Annejulia, Dishita, and Keyura ♡</footer>
 </body>
 </html>
