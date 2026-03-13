@@ -94,14 +94,14 @@
     </div>
     <div class="mt-4" style="display: flex; gap: 20px; margin: auto; max-width: 1400px;">
     <div class="card mt-4" style="flex: 1;">
+        <h4 class="card-title" style="margin-top:20px; margin-left:20px">Device Split</h4>
         <div style="flex: 1; height: 350px;">
-            <h4 class="card-title">Device Split</h4>
             <canvas id="deviceChart"></canvas>
         </div>
     </div>
     <div class="card mt-4" style="flex: 1;">
+        <h4 class="card-title" style="margin-top:20px; margin-left:20px">First Page vs Last Page</h4>
         <div style="flex: 1; height: 350px;">
-            <h4 class="card-title">First Page vs Last Page</h4>
             <canvas id="firstLastPageChart"></canvas>
         </div>
     </div>
