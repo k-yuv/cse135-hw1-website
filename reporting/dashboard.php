@@ -1,42 +1,55 @@
 <?php
     session_start();
- 
+
     if (!isset($_SESSION['valid'])) {
         header("Location: login.php");
         exit;
     }
- 
+
     $db_dsn  = "pgsql:host=127.0.0.1;port=5432;dbname=postgres;";
     $db_user = "postgres";
     $db_pass = "Sanrio135Cse";
- 
-    $total_pageviews  = 0;
-    $unique_sessions  = 0;
-    $avg_load_time    = 0;
-    $error_count      = 0;
- 
+
+    $total_pageviews     = 0;
+    $unique_sessions     = 0;
+    $avg_load_time       = 0;
+    $error_count         = 0;
+    $pageviews_over_time = [];
+
     try {
         $pdo = new PDO($db_dsn, $db_user, $db_pass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ]);
- 
+
         // Total page views
         $stmt = $pdo->query("SELECT COUNT(*) FROM pageviews");
         $total_pageviews = $stmt->fetchColumn();
- 
+
         // Unique sessions
         $stmt = $pdo->query("SELECT COUNT(DISTINCT session_id) FROM sessions");
         $unique_sessions = $stmt->fetchColumn();
- 
+
         // Average load time (in seconds, rounded to 2 decimal places)
         $stmt = $pdo->query("SELECT AVG(load_time) FROM performance WHERE load_time IS NOT NULL");
         $avg_raw = $stmt->fetchColumn();
         $avg_load_time = $avg_raw !== null ? round($avg_raw / 1000, 2) . 's' : 'N/A';
- 
+
         // Error count
         $stmt = $pdo->query("SELECT COUNT(*) FROM errors");
         $error_count = $stmt->fetchColumn();
- 
+
+        // Pageviews over time — grouped by day for the last 30 days
+        $stmt = $pdo->query("
+            SELECT
+                DATE(server_timestamp) AS day,
+                COUNT(*) AS views
+            FROM pageviews
+            WHERE server_timestamp >= NOW() - INTERVAL '30 days'
+            GROUP BY day
+            ORDER BY day ASC
+        ");
+        $pageviews_over_time = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     } catch (PDOException $e) {
         // Silently fall back to defaults; log in production
         error_log("DB error: " . $e->getMessage());
@@ -55,7 +68,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
- 
+
 <nav class="navbar">
     <div class="left-navbar">
         <a href="dashboard.php" class="active">Dashboard</a>
@@ -68,7 +81,7 @@
         <a href="logout.php">Logout</a>
     </div>
 </nav>
- 
+
 <body>
     <h1>Dashboard</h1>
     <div class="row">
@@ -78,21 +91,21 @@
                 <p class="text-muted"><?= htmlspecialchars($total_pageviews) ?></p>
             </div>
         </div>
- 
+
         <div class="card text-center" style="width: 20%">
             <div class="card-body p-5">
                 <h4 class="card-title">Unique Sessions</h4>
                 <p class="text-muted"><?= htmlspecialchars($unique_sessions) ?></p>
             </div>
         </div>
- 
+
         <div class="card text-center" style="width: 20%">
             <div class="card-body p-5">
                 <h4 class="card-title">Average Load Time</h4>
                 <p class="text-muted"><?= htmlspecialchars($avg_load_time) ?></p>
             </div>
         </div>
- 
+
         <div class="card text-center" style="width: 20%">
             <div class="card-body p-5">
                 <h4 class="card-title">Error Count</h4>
@@ -100,11 +113,61 @@
             </div>
         </div>
     </div>
- 
-    <p>line graph of page views over time</p>
- 
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4 class="card-title">Page Views Over Time (Last 30 Days)</h4>
+            <canvas id="pageviewsChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const labels = <?= json_encode(array_column($pageviews_over_time, 'day')) ?>;
+        const data   = <?= json_encode(array_map('intval', array_column($pageviews_over_time, 'views'))) ?>;
+
+        new Chart(document.getElementById('pageviewsChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Page Views',
+                    data: data,
+                    borderColor: 'rgb(99, 102, 241)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: ctx => ctx[0].label,
+                            label: ctx => ` ${ctx.parsed.y} views`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { maxTicksLimit: 10 }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
+            }
+        });
+    </script>
+
     <p>table of top pages</p>
- 
+
     <footer>hi!!</footer>
 </body>
 </html>
