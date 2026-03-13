@@ -119,11 +119,15 @@
     </button>
     </div>
     <div style="display: flex; gap: 20px; margin: 40px auto; max-width: 1400px;">
-    <div style="flex: 1; height: 350px;">
-        <canvas id="deviceChart"></canvas>
+    <div class="card mt-4">
+        <div style="flex: 1; height: 350px;">
+            <canvas id="deviceChart"></canvas>
+        </div>
     </div>
-    <div style="flex: 1; height: 350px;">
-        <canvas id="firstLastPageChart"></canvas>
+    <div class="card mt-4">
+        <div style="flex: 1; height: 350px;">
+            <canvas id="firstLastPageChart"></canvas>
+        </div>
     </div>
 
     </div>
