@@ -10,6 +10,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install minifiers
+        run: npm install -g html-minifier-terser terser clean-css-cli
+
+      - name: Minify assets
+        run: |
+          # Minify HTML
+          find reporting www collector -name "*.html" | while read f; do
+            html-minifier-terser \
+              --collapse-whitespace \
+              --remove-comments \
+              --minify-css true \
+              --minify-js true \
+              "$f" -o "$f"
+          done
+
+          # Minify JS
+          find reporting www collector -name "*.js" ! -name "*.min.js" | while read f; do
+            terser "$f" -o "$f" --compress --mangle
+          done
+
+          # Minify CSS
+          find reporting www collector -name "*.css" ! -name "*.min.css" | while read f; do
+            cleancss -o "$f" "$f"
+          done
+
       - name: Deploy via rsync
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
