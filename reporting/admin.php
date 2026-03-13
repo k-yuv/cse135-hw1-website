@@ -112,7 +112,7 @@
 </nav>
 
 <body>
-    <h1>Dashboard</h1>
+    <h1>Admin</h1>
     <div style="display: flex; justify-content:center">
     <button onclick="exportToPDF()" class="btn btn-3d-lift">
         Export as PDF
