@@ -1,7 +1,7 @@
 <?php
     session_start();
 
-    if (!isset($_SESSION['valid'])) {
+    if (!isset($_SESSION['valid']) || $_SESSION['username'] == 'VashTheStampede') {
         header("Location: login.php");
         exit;
     }
