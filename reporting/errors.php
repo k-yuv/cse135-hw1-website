@@ -111,6 +111,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
+        function addComment() {
+            const input = document.getElementById('analystInput');
+            const text  = input.value.trim();
+            if (!text) return;
+
+            const div = document.createElement('div');
+            div.style.cssText = 'background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;';
+            div.innerHTML = `<strong style="color:#7a4fa3;">Analyst comment:</strong> ${text}`;
+
+            document.getElementById('analystComments').appendChild(div);
+            input.value = '';
+        }
         async function exportToPDF() {
             const { jsPDF } = window.jspdf;
             const element = document.getElementById('main-content');
@@ -152,11 +164,26 @@
     </div>
 </nav>
 
-<div class="main-content" id="main-content">
+<div class="main-content">
     <h1>Errors</h1>
     <div style="display: flex; justify-content: center;">
         <button onclick="exportToPDF()" class="btn btn-3d-lift">Export as PDF</button>
     </div>
+
+    <!-- Analyst comment input -->
+    <div style="display: flex; justify-content: center; margin: 16px auto; max-width: 1400px;">
+        <div style="display: flex; gap: 10px; width: 100%;">
+            <input type="text" id="analystInput" class="form-control"
+                placeholder="Add an analyst comment..."
+                onkeydown="if(event.key === 'Enter') addComment()">
+            <button onclick="addComment()" class="btn btn-3d-lift">Add Comment</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        
+    <!-- Comments appear here -->
+    <div id="analystComments"></div>
 
     <!-- Row 1: Top error messages + Errors by page (side by side) -->
     <div class="mt-4" style="display: flex; gap: 20px; margin:auto; margin-bottom:0px; max-width: 1400px;">
@@ -226,6 +253,7 @@
 
     <footer class="mt-4">By Annejulia, Dishita, and Keyura ♡</footer>
 </div>
+        </div>
 
 <script>
     const palette = ['#b08fd4', '#f4a7c3', '#d4a8e0', '#f9d0e3', '#e8c8f0', '#c9a0dc', '#f7c5d5', '#dbb8ed'];

@@ -162,7 +162,7 @@
             <button onclick="addComment()" class="btn btn-3d-lift">Add Comment</button>
         </div>
     </div>
-
+    <div id="main-content">
     <!-- Comments appear here -->
     <div id="analystComments"></div>
 
@@ -222,6 +222,7 @@
     </div>
 
     <footer class="mt-4">By Annejulia, Dishita, and Keyura ♡</footer>
+</div>
 </div>
 
 <script>
