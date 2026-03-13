@@ -105,6 +105,33 @@
 
                 pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
 
+                // Slowest pages table
+                pdf.addPage();
+                pdf.setFontSize(14);
+                pdf.text('Top 5 Slowest Pages', 14, 16);
+
+                const slowest = <?= json_encode($slowest_pages) ?>;
+                const headers = ['URL', 'Avg Load (ms)', 'Avg TTFB (ms)', 'Avg LCP (ms)', 'Samples'];
+                const keys    = ['url', 'avg_load_time', 'avg_ttfb', 'avg_lcp', 'samples'];
+                const colWidths = [120, 35, 35, 35, 25];
+
+                let y = 26;
+                pdf.setFontSize(9);
+                pdf.setFont(undefined, 'bold');
+                headers.forEach((h, i) => {
+                    pdf.text(h, 14 + colWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
+                });
+                y += 8;
+                pdf.setFont(undefined, 'normal');
+                slowest.forEach(row => {
+                    keys.forEach((k, i) => {
+                        const val = String(row[k] ?? '');
+                        const trunc = val.length > 40 ? val.slice(0, 37) + '...' : val;
+                        pdf.text(trunc, 14 + colWidths.slice(0, i).reduce((a, b) => a + b, 0), y);
+                    });
+                    y += 8;
+                });
+                
                 // Full performance log from ZingGrid
                 pdf.addPage();
                 pdf.setFontSize(14);
@@ -207,7 +234,7 @@
     </div>
 
     <!-- Full Performance Table -->
-    <div class="card mt-4 pb-3">
+    <div class="card mt-4 ">
         <div class="card-body">
             <h4 class="card-title">Performance Log</h4>
             <zing-grid id="performanceGrid" sort pager page-size="15">
