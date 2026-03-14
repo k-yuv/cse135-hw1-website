@@ -201,6 +201,10 @@
         </div>
     </div>
 
+    <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> The bar graph on the left shows the the most prevelant error is a syntax error. Combined with the graph on the right, work needs to be done to address syntax errors on product-detail page.
+    </div>
+
     <!-- Row 2: Error frequency over time + Pie chart (side by side) -->
     <div style="display: flex; gap: 20px; margin: 10px auto; max-width: 1400px;">
         <div class="card mt-0 pb-3" style="flex: 2;">
@@ -230,6 +234,10 @@
                 </zg-colgroup>
             </zing-grid>
         </div>
+    </div>
+
+    <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> The table above shows that errors with no error message are mostly seen on product detail pages, showing that more error testing should be done by developers.
     </div>
 
     <!-- All errors table -->

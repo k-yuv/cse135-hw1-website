@@ -198,6 +198,10 @@
         </div>
     </div>
 
+    <div style="background:#fdf6ff; border-left:4px solid #b08fd4; border-radius:4px; padding:14px 18px; font-size:14px; color:#444; max-width:1400px; margin:12px auto 0;">
+    <strong style="color:#7a4fa3;">Analyst comment:</strong> The table above suggests that work needs to done to improve the performance of the Accessories tab, perhaps due to infinite scroll.
+    </div>
+
     <!-- Full Performance Table -->
     <div class="card mt-4 ">
         <div class="card-body">
