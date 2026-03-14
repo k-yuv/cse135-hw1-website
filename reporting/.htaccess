@@ -1,10 +1,7 @@
 ErrorDocument 404 /404.html
 ErrorDocument 403 /403.html
 
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  # Internally forward /page to /page.php
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME}.php -f
-  RewriteRule ^(.*)$ $1.php [L]
-</IfModule>
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(([A-Za-z0-9\-]+/)*[A-Za-z0-9\-]+)?$ $1.php
