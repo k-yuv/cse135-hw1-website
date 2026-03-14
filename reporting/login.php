@@ -2,7 +2,7 @@
    //ob_start();
    session_start();
    if (isset($_SESSION['valid'])) {
-        header("Location: dashboard.php");
+        header("Location: dashboard");
         exit;
     }
 
@@ -33,7 +33,7 @@
                $_SESSION['username']     = $row['display_name'];
                $_SESSION['display_name'] = $display_name;
                $_SESSION['role']         = $row['role'];
-               header("Location: dashboard.php");
+               header("Location: dashboard");
                exit;
             } else {
                $msg = "Wrong password (｡•́︿•̀｡)";

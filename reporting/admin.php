@@ -2,7 +2,7 @@
     session_start();
 
     if (!isset($_SESSION['valid']) || $_SESSION['username'] != 'super-admin') {
-        header("Location: login.php");
+        header("Location: login");
         exit;
     }
 
@@ -82,30 +82,30 @@
 <body>
 <nav class="navbar">
     <div class="left-navbar">
-        <a href="dashboard.php" class="active">Dashboard</a>
+        <a href="dashboard" class="active">Dashboard</a>
         <?php if ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'owner'): ?>
 
             <?php if ($_SESSION['username'] != 'chiikawa'): ?>
-                <a href="performance.php">Performance</a>
+                <a href="performance">Performance</a>
             <?php endif; ?>
               
             <?php if ($_SESSION['username'] != 'VashTheStampede'): ?>
-                <a href="behavior.php">Behavior</a>
+                <a href="behavior">Behavior</a>
             <?php endif; ?>
 
             <?php if ($_SESSION['username'] != 'chiikawa'): ?>
-                <a href="errors.php">Errors</a>
+                <a href="errors">Errors</a>
             <?php endif; ?>
 
         <?php endif; ?>
 
         <?php if ($_SESSION['username'] == 'super-admin'): ?>
-            <a href="admin.php">Admin</a> 
+            <a href="admin">Admin</a> 
         <?php endif; ?>
 
     </div>
     <div class="right-navbar d-flex align-items-center">
-        <a href="logout.php">Logout</a>
+        <a href="logout">Logout</a>
         <p class='d-block text-center py-2 px-3 mb-0'> <?php echo $_SESSION['username'] ?> </p>
     </div>
 </nav>
@@ -140,7 +140,7 @@
     <div class="card mt-4">
         <div class="card-body">
             <h4 class="card-title">Add User</h4>
-            <form method="POST" action="admin.php">
+            <form method="POST" action="admin">
                 <input type="hidden" name="action" value="add">
                 <div class="row g-3">
                     <div class="col-md-3">
@@ -171,7 +171,7 @@
     </div>
 
     <!-- Hidden remove form, submitted via JS -->
-    <form id="removeForm" method="POST" action="admin.php" style="display:none;">
+    <form id="removeForm" method="POST" action="admin" style="display:none;">
         <input type="hidden" name="action" value="remove">
         <input type="hidden" name="user_id" id="removeUserId">
     </form>

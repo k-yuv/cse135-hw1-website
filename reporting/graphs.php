@@ -22,7 +22,7 @@
 </head>
 
 <body>
-    <a href="logout.php" title="Logout">Logout</a>
+    <a href="logout" title="Logout">Logout</a>
 
     <button onclick="exportToPDF()" style="display:block; margin: 20px auto; padding: 10px 20px; cursor: pointer;">
         Export as PDF

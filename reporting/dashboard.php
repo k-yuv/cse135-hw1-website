@@ -2,7 +2,7 @@
     session_start();
 
     if (!isset($_SESSION['valid'])) {
-        header("Location: login.php");
+        header("Location: login");
         exit;
     }
 
@@ -102,30 +102,30 @@
 <body>
 <nav class="navbar">
     <div class="left-navbar">
-        <a href="dashboard.php" class="active">Dashboard</a>
+        <a href="dashboard" class="active">Dashboard</a>
         <?php if ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'owner'): ?>
 
             <?php if ($_SESSION['username'] != 'chiikawa'): ?>
-                <a href="performance.php">Performance</a>
+                <a href="performance">Performance</a>
             <?php endif; ?>
               
             <?php if ($_SESSION['username'] != 'VashTheStampede'): ?>
-                <a href="behavior.php">Behavior</a>
+                <a href="behavior">Behavior</a>
             <?php endif; ?>
 
             <?php if ($_SESSION['username'] != 'chiikawa'): ?>
-                <a href="errors.php">Errors</a>
+                <a href="errors">Errors</a>
             <?php endif; ?>
 
         <?php endif; ?>
 
         <?php if ($_SESSION['username'] == 'super-admin'): ?>
-            <a href="admin.php">Admin</a> 
+            <a href="admin">Admin</a> 
         <?php endif; ?>
 
     </div>
     <div class="right-navbar d-flex align-items-center">
-        <a href="logout.php">Logout</a>
+        <a href="logout">Logout</a>
         <p class='d-block text-center py-2 px-3 mb-0'> <?php echo $_SESSION['username'] ?> </p>
     </div>
 </nav>
